@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Zen Theme – Relative Palette (HSL + Ritual)</title>
+
+  <!-- Schöne Schrift -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <!-- Hintergrund Orbs -->
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+
+  <!-- Ritual Overlay -->
+  <div id="ritualOverlay" class="ritual-overlay" aria-hidden="true">
+    <div class="ritual-center">
+      <div class="ritual-moon">🌙</div>
+      <div class="ritual-text" id="ritualText">Danke…</div>
+      <div class="ritual-sub" id="ritualSub">Atme aus und lass los.</div>
+    </div>
+  </div>
+
+  <!-- Audio (optional) -->
+  <audio id="bowlAudio" preload="auto">
+    <source src="klangschale.mp3" type="audio/mpeg" />
+  </audio>
+
+  <header class="topbar glass">
+    <div class="brand">
+      <div class="logo">禅</div>
+      <div class="brand-text">
+        <div class="title">Zen Theme</div>
+        <div class="subtitle">Relative Palette • HSL • Ritual</div>
+      </div>
+    </div>
+
+    <div class="top-actions">
+      <button class="btn btn-ghost" id="btnTheme">🌙 Dark</button>
+      <button class="btn btn-ghost" id="btnFullscreen">⛶ Vollbild</button>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <section class="hero glass">
+      <h1>Ein Atemzug – und alles wird ruhig.</h1>
+      <p class="lead">
+        Du steuerst jetzt die komplette Palette über <b>3 Regler</b>:
+        <b>Hue</b> (Farbton), <b>Saturation</b> (Pastell/kräftig) und <b>Lightness</b> (Helligkeit).
+      </p>
+
+      <div class="controls">
+
+        <div class="control glass-soft">
+          <div class="control-head">
+            <div class="control-title">🎨 Farbton (Hue)</div>
+            <div class="pill" id="hueValue">180°</div>
+          </div>
+          <input id="hueSlider" type="range" min="0" max="360" value="180" />
+          <div class="muted small">Türkis: ca. 175–190°</div>
+
+          <div class="preset-row">
+            <button class="btn btn-soft preset" data-h="180">Türkis</button>
+            <button class="btn btn-soft preset" data-h="260">Lavendel</button>
+            <button class="btn btn-soft preset" data-h="120">Waldgrün</button>
+            <button class="btn btn-soft preset" data-h="40">Sand</button>
+            <button class="btn btn-soft preset" data-h="210">Nachtblau</button>
+          </div>
+        </div>
+
+        <div class="control glass-soft">
+          <div class="control-head">
+            <div class="control-title">🌿 Sättigung (S)</div>
+            <div class="pill" id="satValue">50%</div>
+          </div>
+          <input id="satSlider" type="range" min="0" max="100" value="50" />
+          <div class="muted small">Niedrig = Zen / Pastell • Hoch = kräftig</div>
+        </div>
+
+        <div class="control glass-soft">
+          <div class="control-head">
+            <div class="control-title">☀️ Helligkeit (L)</div>
+            <div class="pill" id="lightValue">50%</div>
+          </div>
+          <input id="lightSlider" type="range" min="0" max="100" value="50" />
+          <div class="muted small">Steuert die Basisfarbe (Primary 500)</div>
+        </div>
+
+      </div>
+
+      <div class="hero-actions">
+        <button class="btn btn-primary" id="btnNextQuote">✨ Neues Zitat</button>
+        <button class="btn btn-soft" id="btnBreath">🌿 Atem-Impuls</button>
+        <button class="btn btn-ghost" id="btnRitual">🌙 Abschlussritual</button>
+      </div>
+
+      <div class="notice">
+        Tipp: Das Ritual wirkt besonders schön im Vollbild.
+      </div>
+    </section>
+
+    <section class="grid">
+
+      <article class="card glass">
+        <div class="card-head">
+          <h2>Zitat</h2>
+          <span class="pill">Thich Nhat Hanh</span>
+        </div>
+
+        <blockquote id="quote" class="quote">
+          „Atme ein, und ich beruhige Körper und Geist. Atme aus, und ich lächle.“
+        </blockquote>
+
+        <div class="row wrap">
+          <button class="btn btn-primary" id="btnCopy">📋 Kopieren</button>
+          <button class="btn btn-ghost" id="btnToast">🔔 Hinweis</button>
+        </div>
+      </article>
+
+      <article class="card glass">
+        <div class="card-head">
+          <h2>Zen Buttons</h2>
+          <span class="pill pill-soft">Ripple</span>
+        </div>
+
+        <p class="muted">
+          Alles bleibt weich und harmonisch – auch wenn du die Farbe änderst.
+        </p>
+
+        <div class="row wrap">
+          <button class="btn btn-success">✓ Success</button>
+          <button class="btn btn-warning">⚠ Warning</button>
+          <button class="btn btn-danger">✕ Danger</button>
+          <button class="btn btn-ghost" id="btnReset">↺ Reset</button>
+        </div>
+
+        <div class="breath-wrap">
+          <div class="breath-circle" id="breathCircle">
+            <div class="breath-inner"></div>
+          </div>
+          <div class="breath-text">
+            <div class="muted small">Atem-Kreis</div>
+            <div class="big" id="breathLabel">Ruhe</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card glass">
+        <div class="card-head">
+          <h2>Palette</h2>
+          <span class="pill pill-dark">50–900</span>
+        </div>
+
+        <div class="swatches">
+          <div class="swatch" style="background:var(--primary-50)">50</div>
+          <div class="swatch" style="background:var(--primary-100)">100</div>
+          <div class="swatch" style="background:var(--primary-200)">200</div>
+          <div class="swatch" style="background:var(--primary-300)">300</div>
+          <div class="swatch" style="background:var(--primary-400)">400</div>
+          <div class="swatch swatch-base" style="background:var(--primary-500)">500</div>
+          <div class="swatch" style="background:var(--primary-600)">600</div>
+          <div class="swatch" style="background:var(--primary-700)">700</div>
+          <div class="swatch" style="background:var(--primary-800)">800</div>
+          <div class="swatch" style="background:var(--primary-900)">900</div>
+        </div>
+      </article>
+
+    </section>
+
+    <footer class="footer">
+      <div class="muted small">
+        Zen Theme Demo • HSL Regler + Ritual • für Jo 🫶
+      </div>
+    </footer>
+
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
