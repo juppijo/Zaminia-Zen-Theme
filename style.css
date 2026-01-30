@@ -130,6 +130,16 @@ body{
 
 h1,h2{ letter-spacing: -0.02em; }
 
+.welcome-img {
+    width: 150px;       /* Größe des Bildes */
+    height: 150px;
+    border-radius: 50%; /* Macht das Bild rund */
+    object-fit: cover;
+    border: 3px solid #d4a373;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    outline: 1px solid #dcdcdc;
+}
+
 .bg-orb{
   position: fixed;
   width: 520px;
