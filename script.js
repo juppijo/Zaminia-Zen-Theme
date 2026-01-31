@@ -1,43 +1,59 @@
 const $ = (sel) => document.querySelector(sel);
 
-/* Buttons */
+/* UI Elemente */
 const btnTheme = $("#btnTheme");
 const btnFullscreen = $("#btnFullscreen");
 const btnNextQuote = $("#btnNextQuote");
 const btnCopy = $("#btnCopy");
-const btnToast = $("#btnToast");
 const btnBreath = $("#btnBreath");
 const btnReset = $("#btnReset");
 const btnRitual = $("#btnRitual");
+const btnMusic = $("#btnMusic");
 
-/* Toast */
-const toast = $("#toast");
-let toastTimer = null;
+/* Settings Modal Elemente */
+const btnSettings = $("#btnSettings");
+const btnCloseSettings = $("#btnCloseSettings");
+const settingsModal = $("#settingsModal");
 
-/* Sliders */
+/* Sliders & Values */
 const hueSlider = $("#hueSlider");
 const satSlider = $("#satSlider");
 const lightSlider = $("#lightSlider");
+const timerSlider = $("#timerSlider");
 
 const hueValue = $("#hueValue");
 const satValue = $("#satValue");
 const lightValue = $("#lightValue");
+const timerValue = $("#timerValue");
 
-/* Quote */
-const quoteEl = $("#quote");
-
-/* Breath */
+/* Audio & Timer Status */
+const bowlAudio = $("#bowlAudio");
+const meditationAudio = $("#meditationAudio");
 const breathCircle = $("#breathCircle");
 const breathLabel = $("#breathLabel");
-let breathing = false;
-
-/* Ritual */
+const quoteEl = $("#quote");
+const toast = $("#toast");
 const ritualOverlay = $("#ritualOverlay");
 const ritualText = $("#ritualText");
 const ritualSub = $("#ritualSub");
-const bowlAudio = $("#bowlAudio");
 
-/* Quotes (German paraphrases / common translations) */
+const btnPause = $("#btnPause");
+const btnToggleBowl = $("#btnToggleBowl");
+
+/* GLOBALE STATUS VARIABLEN */
+let breathing = false;
+let isMusicPlaying = false; // Musik-Master-Schalter
+let isBowlEnabled = true;   // Bowl-Sub-Schalter
+let isPaused = false;
+let countdownInterval = null;
+let timeLeft = 180;
+let toastTimer = null;
+
+// Timer Anzeige dynamisch erstellen
+const timerDisplay = document.createElement("div");
+timerDisplay.className = "timer-display";
+if(breathCircle) breathCircle.before(timerDisplay);
+
 const quotes = [
   "„Atme ein, und ich beruhige Körper und Geist. Atme aus, und ich lächle.“",
   "„Der gegenwärtige Moment ist voller Freude und Glück. Wenn du achtsam bist, wirst du es sehen.“",
@@ -49,6 +65,8 @@ const quotes = [
   "„Wenn wir unseren Geist beruhigen, wird unsere Welt klar.“"
 ];
 
+/* --- FUNKTIONEN --- */
+
 function showToast(msg="🌿 Ruhe…") {
   toast.textContent = msg;
   toast.classList.add("show");
@@ -56,7 +74,16 @@ function showToast(msg="🌿 Ruhe…") {
   toastTimer = setTimeout(() => toast.classList.remove("show"), 2200);
 }
 
-/* Theme */
+function openSettings() {
+  settingsModal.classList.add("open");
+  settingsModal.setAttribute("aria-hidden", "false");
+}
+
+function closeSettings() {
+  settingsModal.classList.remove("open");
+  settingsModal.setAttribute("aria-hidden", "true");
+}
+
 function setTheme(theme) {
   if (theme === "dark") {
     document.documentElement.setAttribute("data-theme", "dark");
@@ -65,233 +92,206 @@ function setTheme(theme) {
     document.documentElement.removeAttribute("data-theme");
     btnTheme.textContent = "🌙 Dark";
   }
-  localStorage.setItem("zen_theme", theme);
 }
+
 function toggleTheme() {
   const isDark = document.documentElement.getAttribute("data-theme") === "dark";
   setTheme(isDark ? "light" : "dark");
-  showToast(isDark ? "☀️ Light Mode" : "🌙 Dark Mode");
 }
 
-/* Fullscreen */
 async function toggleFullscreen() {
-  try {
-    if (!document.fullscreenElement) {
-      await document.documentElement.requestFullscreen();
-      btnFullscreen.textContent = "⛶ Exit";
-      showToast("⛶ Vollbild aktiviert");
-    } else {
-      await document.exitFullscreen();
-      btnFullscreen.textContent = "⛶ Vollbild";
-      showToast("⛶ Vollbild beendet");
-    }
-  } catch {
-    showToast("⚠️ Vollbild nicht möglich");
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
+    btnFullscreen.textContent = "⛶ Exit";
+  } else {
+    document.exitFullscreen();
+    btnFullscreen.textContent = "⛶ Vollbild";
   }
 }
 
-/* Quote */
-function randomQuote() {
-  const q = quotes[Math.floor(Math.random() * quotes.length)];
-  quoteEl.textContent = q;
-  showToast("✨ Ein Satz – ein Atemzug.");
-}
-async function copyQuote() {
-  try {
-    await navigator.clipboard.writeText(quoteEl.textContent.trim());
-    showToast("📋 Zitat kopiert");
-  } catch {
-    showToast("⚠️ Kopieren nicht möglich");
-  }
-}
+function setHue(h){ document.documentElement.style.setProperty("--h", h); hueValue.textContent = h + "°"; }
+function setSat(s){ document.documentElement.style.setProperty("--s", s + "%"); satValue.textContent = s + "%"; }
+function setLight(l){ document.documentElement.style.setProperty("--l", l + "%"); lightValue.textContent = l + "%"; }
 
-/* Relative palette controls: H / S / L */
-function setHue(h){
-  document.documentElement.style.setProperty("--h", String(h));
-  hueValue.textContent = `${h}°`;
-  localStorage.setItem("zen_h", String(h));
-}
-function setSat(s){
-  document.documentElement.style.setProperty("--s", `${s}%`);
-  satValue.textContent = `${s}%`;
-  localStorage.setItem("zen_s", String(s));
-}
-function setLight(l){
-  document.documentElement.style.setProperty("--l", `${l}%`);
-  lightValue.textContent = `${l}%`;
-  localStorage.setItem("zen_l", String(l));
-}
-
-/* Reset */
 function resetAll(){
-  const defaults = { h: 180, s: 28, l: 58 };
-  hueSlider.value = defaults.h;
-  satSlider.value = defaults.s;
-  lightSlider.value = defaults.l;
-
-  setHue(defaults.h);
-  setSat(defaults.s);
-  setLight(defaults.l);
-
-  showToast("↺ Reset auf Zen-Türkis");
+  setHue(180); setSat(50); setLight(50);
+  hueSlider.value = 180; satSlider.value = 50; lightSlider.value = 50;
+  showToast("↺ Reset");
 }
 
-/* Ripple */
-function attachRipple(btn) {
-  btn.addEventListener("click", (e) => {
-    const rect = btn.getBoundingClientRect();
-    const size = Math.max(rect.width, rect.height);
-    const x = e.clientX - rect.left - size / 2;
-    const y = e.clientY - rect.top - size / 2;
-
-    const ripple = document.createElement("span");
-    ripple.className = "ripple";
-    ripple.style.width = ripple.style.height = size + "px";
-    ripple.style.left = x + "px";
-    ripple.style.top = y + "px";
-
-    btn.appendChild(ripple);
-    ripple.addEventListener("animationend", () => ripple.remove());
-  });
+function randomQuote() {
+  quoteEl.textContent = quotes[Math.floor(Math.random() * quotes.length)];
 }
 
-/* Breathing */
-function toggleBreath(){
-  breathing = !breathing;
-  breathCircle.classList.toggle("breathing", breathing);
-  breathLabel.textContent = breathing ? "Ein… Aus…" : "Ruhe";
-  showToast(breathing ? "🌿 Atme weich" : "🕊️ Pause");
-}
+/* AUDIO LOGIK */
 
-/* Ritual: Klangschale + Fade to Night */
-async function playBowl(){
-  if (!bowlAudio) return;
-  try{
-    bowlAudio.currentTime = 0;
-    bowlAudio.volume = 0.85;
-    await bowlAudio.play();
-  }catch{
-    // If autoplay is blocked or file missing: ignore
+function toggleMusic() {
+  if (!meditationAudio) return;
+  isMusicPlaying = !isMusicPlaying;
+
+  if (isMusicPlaying) {
+    meditationAudio.play().catch(() => console.log("Start blockiert"));
+    btnMusic.textContent = "🎶 Musik: An";
+    btnMusic.classList.add("btn-primary");
+  } else {
+    meditationAudio.pause();
+    meditationAudio.currentTime = 0;
+    btnMusic.textContent = "🎵 Musik: Aus";
+    btnMusic.classList.remove("btn-primary");
+    // Falls Musik aus, stoppe auch sofort einen eventuell laufenden Bowl-Ton
+    if(bowlAudio) { bowlAudio.pause(); bowlAudio.currentTime = 0; }
   }
 }
 
-function stopBowlSoft(){
-  if (!bowlAudio) return;
-  try{
-    // Soft fade out
-    const start = bowlAudio.volume ?? 0.85;
-    const steps = 18;
-    let i = 0;
-    const timer = setInterval(()=>{
-      i++;
-      const v = Math.max(0, start * (1 - i/steps));
-      bowlAudio.volume = v;
-      if (i >= steps){
-        clearInterval(timer);
-        bowlAudio.pause();
-      }
-    }, 90);
-  }catch{}
+function toggleBowlSetting() {
+  isBowlEnabled = !isBowlEnabled;
+  if (isBowlEnabled) {
+    btnToggleBowl.textContent = "✓ Bowl: An";
+    btnToggleBowl.classList.replace("btn-soft", "btn-success");
+  } else {
+    btnToggleBowl.textContent = "✕ Bowl: Aus";
+    btnToggleBowl.classList.replace("btn-success", "btn-soft");
+  }
 }
 
-function openRitual(){
-  ritualOverlay.classList.add("show");
-  ritualOverlay.setAttribute("aria-hidden", "false");
-  document.body.style.overflow = "hidden";
+/* TIMER & ATMUNG */
+
+function updateTimerDisplay(seconds) {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  timerDisplay.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
 }
-function closeRitual(){
-  ritualOverlay.classList.remove("show");
-  ritualOverlay.setAttribute("aria-hidden", "true");
-  document.body.style.overflow = "";
+
+function startTimer(isResuming = false) {
+  clearInterval(countdownInterval);
+  timerDisplay.classList.add("active");
+  
+  // Schale nur, wenn Master-Musik AN und Bowl-Sub AN
+  if (isMusicPlaying && isBowlEnabled && bowlAudio && !isResuming) { 
+    bowlAudio.currentTime = 0; 
+    bowlAudio.play().catch(e => console.log("Audio blockiert")); 
+  }
+  
+  // Musik starten, falls sie durch toggleMusic() vorbereitet wurde
+  if (isMusicPlaying && meditationAudio && meditationAudio.paused) {
+    meditationAudio.play().catch(e => console.log("Musik blockiert"));
+  }
+
+  countdownInterval = setInterval(() => {
+    timeLeft--;
+    updateTimerDisplay(timeLeft);
+    if (timeLeft <= 0) stopTimer(true);
+  }, 1000);
+}
+
+function stopTimer(withEndSound = false) {
+  clearInterval(countdownInterval);
+  breathing = false;
+  isPaused = false;
+  
+  if (meditationAudio) { meditationAudio.pause(); meditationAudio.currentTime = 0; }
+  
+  breathCircle.classList.remove("breathing");
+  breathCircle.style.animationPlayState = "running";
+  breathLabel.textContent = "Ruhe";
+  timerDisplay.classList.remove("active");
+
+  // MASTER-REGEL: End-Gong NUR wenn Musik-Button auf AN steht
+  if (withEndSound && isMusicPlaying && isBowlEnabled && bowlAudio) { 
+    bowlAudio.currentTime = 0; 
+    bowlAudio.play(); 
+  }
+}
+
+function toggleBreath() {
+  if (isPaused) { togglePause(); return; } 
+  
+  breathing = !breathing;
+  if (breathing) {
+    // NEU: Wenn Musik noch aus ist, schalte sie jetzt ein
+    if (!isMusicPlaying) {
+      toggleMusic(); 
+    }
+
+    timeLeft = timerSlider.value * 60;
+    updateTimerDisplay(timeLeft);
+    breathCircle.classList.add("breathing");
+    breathLabel.textContent = "Ein… Aus…";
+    startTimer();
+  } else {
+    stopTimer();
+  }
+}
+
+function togglePause() {
+  if (!breathing) return;
+  isPaused = !isPaused;
+
+  if (isPaused) {
+    clearInterval(countdownInterval);
+    if (meditationAudio) meditationAudio.pause();
+    if (bowlAudio) { bowlAudio.pause(); } // Bowl sofort stoppen bei Pause
+    btnPause.textContent = "▶ Weiter";
+    btnPause.classList.replace("btn-danger", "btn-success");
+    breathCircle.style.animationPlayState = "paused";
+    breathLabel.textContent = "Pause...";
+  } else {
+    if (isMusicPlaying && meditationAudio) meditationAudio.play();
+    btnPause.textContent = "✕ Pause";
+    btnPause.classList.replace("btn-success", "btn-danger");
+    breathCircle.style.animationPlayState = "running";
+    breathLabel.textContent = "Ein… Aus…";
+    startTimer(true); // Fortsetzen ohne Start-Gong
+  }
 }
 
 async function startRitual(){
-  showToast("🌙 Abschlussritual…");
-
-  // Make it dark automatically
   setTheme("dark");
-
-  // Breath off for calm
-  breathing = false;
-  breathCircle.classList.remove("breathing");
-  breathLabel.textContent = "Stille";
-
-  ritualText.textContent = "Danke…";
-  ritualSub.textContent = "Atme aus und lass los.";
-
-  openRitual();
-  await playBowl();
-
-  // After a moment show a second line
-  setTimeout(()=>{
-    ritualText.textContent = "Gute Nacht";
-    ritualSub.textContent = "Mögest du Frieden in dir finden.";
-  }, 2400);
+  ritualOverlay.classList.add("show");
+  // MASTER-REGEL: Ritual-Ton NUR wenn Musik-Button auf AN steht
+  if (isMusicPlaying && bowlAudio) { 
+    bowlAudio.currentTime = 0; 
+    bowlAudio.play(); 
+  }
 }
 
-/* Exit ritual on click / ESC */
-function ritualExit(){
-  stopBowlSoft();
-  closeRitual();
-  showToast("🕊️ Ritual beendet");
-}
-
-/* Init */
-(function init(){
-  // Load theme
-  const savedTheme = localStorage.getItem("zen_theme");
-  if (savedTheme === "dark") setTheme("dark");
-
-  // Load HSL
-  const savedH = localStorage.getItem("zen_h");
-  const savedS = localStorage.getItem("zen_s");
-  const savedL = localStorage.getItem("zen_l");
-
-  if (savedH) hueSlider.value = savedH;
-  if (savedS) satSlider.value = savedS;
-  if (savedL) lightSlider.value = savedL;
-
-  setHue(parseInt(hueSlider.value, 10));
-  setSat(parseInt(satSlider.value, 10));
-  setLight(parseInt(lightSlider.value, 10));
-
-  hueSlider.addEventListener("input", () => setHue(parseInt(hueSlider.value, 10)));
-  satSlider.addEventListener("input", () => setSat(parseInt(satSlider.value, 10)));
-  lightSlider.addEventListener("input", () => setLight(parseInt(lightSlider.value, 10)));
-
-  // Presets (only hue changes)
-  document.querySelectorAll(".preset").forEach(btn=>{
-    btn.addEventListener("click", ()=>{
-      const h = parseInt(btn.dataset.h, 10);
-      hueSlider.value = h;
-      setHue(h);
-      showToast("🎨 Neue Stimmung");
-    });
+function attachRipple(btn) {
+  btn.addEventListener("click", (e) => {
+    const ripple = document.createElement("span");
+    ripple.className = "ripple";
+    btn.appendChild(ripple);
+    setTimeout(() => ripple.remove(), 600);
   });
+}
 
-  // Buttons
+/* --- INIT --- */
+(function init(){
   btnTheme.addEventListener("click", toggleTheme);
+  btnMusic.addEventListener("click", toggleMusic);
+  btnSettings.addEventListener("click", openSettings);
+  btnCloseSettings.addEventListener("click", closeSettings);
   btnFullscreen.addEventListener("click", toggleFullscreen);
   btnNextQuote.addEventListener("click", randomQuote);
-  btnCopy.addEventListener("click", copyQuote);
-  btnToast.addEventListener("click", ()=> showToast("🔔 Achtsamkeit ist schon der Weg."));
   btnBreath.addEventListener("click", toggleBreath);
   btnReset.addEventListener("click", resetAll);
   btnRitual.addEventListener("click", startRitual);
+  btnPause.addEventListener("click", togglePause);
+  btnToggleBowl.addEventListener("click", toggleBowlSetting);
 
-  // Ripple
+  hueSlider.addEventListener("input", () => setHue(hueSlider.value));
+  satSlider.addEventListener("input", () => setSat(satSlider.value));
+  lightSlider.addEventListener("input", () => setLight(lightSlider.value));
+  timerSlider.addEventListener("input", () => {
+    timerValue.textContent = `${timerSlider.value} Min.`;
+  });
+
+  document.querySelectorAll(".preset").forEach(btn => {
+    btn.addEventListener("click", () => {
+      hueSlider.value = btn.dataset.h;
+      setHue(btn.dataset.h);
+    });
+  });
+
+  ritualOverlay.addEventListener("click", () => ritualOverlay.classList.remove("show"));
   document.querySelectorAll("button.btn").forEach(attachRipple);
-
-  // Fullscreen change
-  document.addEventListener("fullscreenchange", () => {
-    if (!document.fullscreenElement) btnFullscreen.textContent = "⛶ Vollbild";
-  });
-
-  // Ritual exit
-  ritualOverlay.addEventListener("click", ritualExit);
-  document.addEventListener("keydown", (e)=>{
-    if (e.key === "Escape" && ritualOverlay.classList.contains("show")){
-      ritualExit();
-    }
-  });
 })();

@@ -1,48 +1,45 @@
-# 🌿 Zen Color Palette Studio
+# 🧘 Zen Breath & Meditation Timer
 
-Eine kleine, meditative Web-App (HTML/CSS/JS), mit der du aus einer Grundfarbe (z.B. **Pastel Türkis #7fb5b5**) automatisch eine **harmonische CSS-Farbpalette** erzeugst – inklusive **Hue/Sättigung/Helligkeit-Reglern**, Zen-Zitaten (Thich Nhat Hanh), **Vollbild-Modus** und einem **Zen Abschlussritual** mit Klangschale und Fade-to-Night.
+Ein minimalistischer, interaktiver Atem-Timer für Webbrowser, der Fokus auf Ästhetik und Benutzerfreundlichkeit legt. Das Design passt sich dynamisch an deine Stimmung an und hilft dir, durch geführte Atmung und beruhigende Klänge zur Ruhe zu kommen.
 
-> „Atme ein, und du weißt, dass du lebst.“  
-> — Thich Nhat Hanh
-
----
+!
 
 ## ✨ Features
 
-- 🎨 **Farbpalette aus einer Grundfarbe**
-- 🧘 **Zen UI**: ruhig, minimalistisch, weich
-- 🎚️ **3 Regler**:
-  - Farbton (Hue)
-  - Sättigung (Saturation)
-  - Helligkeit (Lightness)
-- 🌈 **Relative Farben** (HSL basiert)
-  - Paletten ändern sich automatisch mit der Grundfarbe
-  - ideal für Design-Systeme
-- 🌓 **Light / Dark Zen Mode**
-- 🖥️ **Vollbild Button**
-- 🌙 **Zen Abschlussritual**
-  - Klangschale
-  - Hintergrund wird sanft „Nacht“
-- 💾 Perfekt für GitHub Pages (läuft komplett lokal, keine Server-Abhängigkeit)
+* **Interaktive Atmung:** Ein pulsierender Kreis leitet dich durch die Ein- und Ausatmung.
+* **Dynamisches Design:** Verändere Farbton, Sättigung und Helligkeit der gesamten Oberfläche in Echtzeit über das Einstellungsmenü.
+* **Fokus-Hintergrund:** Ein radialer Verlauf (Dunkel zu Hell) lenkt die Aufmerksamkeit auf das Zentrum.
+* **Audio-Erlebnis:**
+    * Hintergrundmusik (`Meditation.mp3`) startet automatisch mit dem Atem-Impuls.
+    * Authentischer Klangschalen-Gong (`klangschale.mp3`) markiert Start und Ende.
+    * **Master-Mute:** Ein Klick auf den Musik-Button schaltet alle Töne sofort stumm.
+* **Pause-Funktion:** Halte deine Sitzung jederzeit an – Timer und Animation frieren synchron ein.
+* **Abschluss-Ritual:** Ein spezieller Modus für den Übergang zurück in den Alltag.
+* **Zitate:** Inspirierende Zen-Weisheiten für jeden Moment.
+
+## 🚀 Installation & Nutzung
+
+1.  Klone das Repository oder lade die Dateien herunter.
+2.  Stelle sicher, dass deine Audio-Dateien im Hauptverzeichnis liegen:
+    * `Meditation.mp3`
+    * `klangschale.mp3`
+3.  Öffne die `index.html` in einem modernen Webbrowser.
+
+> **Hinweis:** Da Browser Autoplay-Einschränkungen haben, startet die Musik erst nach deiner ersten Interaktion (Klick auf den Atem-Impuls).
+
+## 🛠️ Technologien
+
+* **HTML5** & **CSS3** (Custom Properties / CSS Variables)
+* **JavaScript** (Vanilla JS, keine externen Frameworks nötig)
+* **Google Fonts:** Nunito für ein sanftes Schriftbild
+
+## 🎨 Anpassung
+
+Du kannst die Standardfarben in der `:root`-Sektion der `style.css` anpassen:
+- `--h`: Start-Farbwert (0-360)
+- `--s`: Sättigung
+- `--l`: Helligkeit
 
 ---
 
-## 🧠 Idee / Philosophie
-
-Farben beeinflussen Geist und Körper.  
-Diese App hilft dir, **Design-Entscheidungen zu vereinfachen** und gleichzeitig einen ruhigen, meditativen Stil zu bewahren.
-
-> „Es gibt keinen Weg zum Glück. Glück ist der Weg.“  
-> — Thich Nhat Hanh
-
----
-
-## 🗂️ Projektstruktur
-
-```txt
-/
-├─ index.html
-├─ style.css
-├─ script.js
-└─ README.md
-+-> klangschale.mp3
+Erstellt mit 🫶 für entspannte Momente.

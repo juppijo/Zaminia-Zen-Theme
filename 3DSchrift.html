@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Zen 3D Schrift</title>
+
+  <style>
+    body{
+      margin:0;
+      overflow:hidden;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background: radial-gradient(circle at 20% 10%, #dff6f6, #071313);
+      color: white;
+    }
+    #hud{
+      position:fixed;
+      left:14px;
+      top:14px;
+      z-index:10;
+      padding:10px 12px;
+      border-radius:14px;
+      background: rgba(0,0,0,0.35);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.12);
+      max-width: 360px;
+      line-height: 1.3;
+    }
+    #hud b{ color:#bff; }
+
+    .btns{
+      display:flex;
+      gap:10px;
+      margin-top:10px;
+      flex-wrap: wrap;
+    }
+    button{
+      cursor:pointer;
+      border:none;
+      padding:10px 12px;
+      border-radius:12px;
+      background: rgba(127,181,181,0.22);
+      color: rgba(255,255,255,0.92);
+      font-weight:700;
+      letter-spacing: .2px;
+      border: 1px solid rgba(127,181,181,0.35);
+      transition: transform .12s ease, background .2s ease;
+    }
+    button:hover{ transform: translateY(-1px); background: rgba(127,181,181,0.32); }
+    button:active{ transform: translateY(0px) scale(0.99); }
+
+    #status{
+      opacity:.9;
+      font-size: 13px;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="hud">
+    <div>🧘 <b>Zen 3D Schrift</b></div>
+    <div id="status">Status: Initialisiere…</div>
+
+    <div class="btns">
+      <button id="btnFullscreen">⛶ Vollbild</button>
+      <button id="btnText">✨ Text wechseln</button>
+      <button id="btnColor">🎨 Farbe wechseln</button>
+    </div>
+
+    <div style="margin-top:10px; opacity:.85; font-size:13px">
+      Ziehen = drehen • Scroll = zoomen
+    </div>
+  </div>
+
+  <!-- NUR Three.js (stabil) -->
+  <script src="https://unpkg.com/three@0.152.2/build/three.min.js"></script>
+
+  <script>
+    const statusEl = document.getElementById("status");
+    const setStatus = (t)=>{ statusEl.textContent = "Status: " + t; console.log("[Zen3D]", t); };
+
+    // ---- Szene / Kamera / Renderer
+    setStatus("JS läuft ✅");
+
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.Fog(0x071313, 8, 22);
+
+    const camera = new THREE.PerspectiveCamera(55, innerWidth/innerHeight, 0.1, 100);
+    camera.position.set(0, 1.4, 6);
+
+    const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    document.body.appendChild(renderer.domElement);
+
+    // ---- Licht (Zen)
+    scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+
+    const key = new THREE.DirectionalLight(0xffffff, 1.15);
+    key.position.set(4, 6, 3);
+    scene.add(key);
+
+    const rim = new THREE.PointLight(0x7fb5b5, 1.25, 30);
+    rim.position.set(-3, 2.4, -2);
+    scene.add(rim);
+
+    // ---- Boden
+    const floor = new THREE.Mesh(
+      new THREE.PlaneGeometry(60, 60),
+      new THREE.MeshStandardMaterial({ color: 0x062020, roughness: 0.95, metalness: 0.0 })
+    );
+    floor.rotation.x = -Math.PI/2;
+    floor.position.y = -0.1;
+    scene.add(floor);
+
+    // ---- Kamera-Controls (ohne OrbitControls! -> wir bauen Mini-Controls selbst)
+    let dragging=false;
+    let lastX=0, lastY=0;
+    let rotY=0, rotX=0.15;
+    let distance=6;
+
+    function clamp(v,a,b){ return Math.max(a, Math.min(b,v)); }
+
+    addEventListener("mousedown",(e)=>{ dragging=true; lastX=e.clientX; lastY=e.clientY; });
+    addEventListener("mouseup",()=> dragging=false);
+    addEventListener("mousemove",(e)=>{
+      if(!dragging) return;
+      const dx = e.clientX-lastX;
+      const dy = e.clientY-lastY;
+      lastX=e.clientX; lastY=e.clientY;
+      rotY += dx*0.008;
+      rotX += dy*0.006;
+      rotX = clamp(rotX, -0.25, 0.75);
+    });
+    addEventListener("wheel",(e)=>{
+      distance += e.deltaY * 0.003;
+      distance = clamp(distance, 3.5, 14);
+    }, {passive:true});
+
+    // ---- ECHTER 3D TEXT ohne externe Loader:
+    // Wir nutzen eine eingebaute "Font JSON" direkt im Code? (zu groß)
+    // -> Trick: Wir erzeugen 3D Text über Canvas + 3D Plane (Fake) wäre nicht echt.
+    // Daher: Wir laden Font per fetch + bauen Font aus THREE.Font (ohne FontLoader Script).
+    setStatus("Lade Font…");
+
+    let textMesh = null;
+    let currentTextIndex = 0;
+
+    const texts = [
+      "Shambala\nLuminia",
+      "Atme.\nLächle.",
+      "Achtsamkeit",
+      "Zen"
+    ];
+
+    const colors = [0x7fb5b5, 0x9cc9c9, 0xb7e3df, 0x6aa3a3];
+    let colorIndex = 0;
+
+    async function loadFont(){
+      // Font JSON laden
+      const url = "https://unpkg.com/three@0.152.2/examples/fonts/helvetiker_regular.typeface.json";
+      const res = await fetch(url);
+      if(!res.ok) throw new Error("Font download failed");
+      const json = await res.json();
+      return new THREE.Font(json);
+    }
+
+    function buildText(font, text){
+      // TextGeometry ist nicht in core -> wir bauen es selbst per Extrude:
+      // Dafür nehmen wir Font.generateShapes()
+      const shapes = font.generateShapes(text, 0.9);
+
+      const geo = new THREE.ExtrudeGeometry(shapes, {
+        depth: 0.25,
+        bevelEnabled: true,
+        bevelThickness: 0.05,
+        bevelSize: 0.03,
+        bevelSegments: 6,
+        steps: 1
+      });
+
+      geo.computeBoundingBox();
+      const box = geo.boundingBox;
+      const xMid = -0.5 * (box.max.x - box.min.x);
+      const yMid = -0.5 * (box.max.y - box.min.y);
+      geo.translate(xMid, yMid, 0);
+
+      const mat = new THREE.MeshStandardMaterial({
+        color: colors[colorIndex],
+        roughness: 0.22,
+        metalness: 0.35
+      });
+
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.position.y = 1.0;
+      return mesh;
+    }
+
+    let font = null;
+
+    loadFont().then(f=>{
+      font = f;
+      setStatus("Font geladen ✅ Erzeuge 3D Text…");
+
+      textMesh = buildText(font, texts[currentTextIndex]);
+      scene.add(textMesh);
+
+      setStatus("Fertig 🌿");
+    }).catch(err=>{
+      console.error(err);
+      setStatus("❌ Font konnte nicht geladen werden. (Offline?)");
+
+      // Fallback: 3D Würfel
+      const cube = new THREE.Mesh(
+        new THREE.BoxGeometry(1.4,1.4,1.4),
+        new THREE.MeshStandardMaterial({ color: 0xff5555, roughness:0.4, metalness:0.1 })
+      );
+      cube.position.y = 1;
+      scene.add(cube);
+    });
+
+    // ---- Buttons
+    document.getElementById("btnFullscreen").addEventListener("click", async ()=>{
+      try{
+        if(!document.fullscreenElement){
+          await document.documentElement.requestFullscreen();
+        }else{
+          await document.exitFullscreen();
+        }
+      }catch(e){
+        alert("Vollbild ging nicht: " + e.message);
+      }
+    });
+
+    document.getElementById("btnText").addEventListener("click", ()=>{
+      if(!font || !textMesh) return;
+
+      scene.remove(textMesh);
+      textMesh.geometry.dispose();
+      textMesh.material.dispose();
+
+      currentTextIndex = (currentTextIndex + 1) % texts.length;
+      textMesh = buildText(font, texts[currentTextIndex]);
+      scene.add(textMesh);
+    });
+
+    document.getElementById("btnColor").addEventListener("click", ()=>{
+      if(!textMesh) return;
+      colorIndex = (colorIndex + 1) % colors.length;
+      textMesh.material.color.setHex(colors[colorIndex]);
+      rim.color.setHex(colors[colorIndex]);
+    });
+
+    // ---- Animation
+    const clock = new THREE.Clock();
+    function animate(){
+      requestAnimationFrame(animate);
+      const t = clock.getElapsedTime();
+
+      // sanftes Zen-Pulsieren
+      const pulse = 1 + Math.sin(t*0.8)*0.015;
+      if(textMesh){
+        textMesh.scale.set(pulse, pulse, pulse);
+        textMesh.rotation.y = Math.sin(t*0.35)*0.25;
+        textMesh.rotation.x = Math.sin(t*0.22)*0.06;
+      }
+
+      // Kamera um Zielpunkt
+      const target = new THREE.Vector3(0, 0.9, 0);
+      camera.position.x = Math.sin(rotY) * distance;
+      camera.position.z = Math.cos(rotY) * distance;
+      camera.position.y = 1.2 + rotX*2.0;
+      camera.lookAt(target);
+
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    addEventListener("resize", ()=>{
+      camera.aspect = innerWidth/innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(innerWidth, innerHeight);
+    });
+  </script>
+</body>
+</html>

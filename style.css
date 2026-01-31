@@ -99,34 +99,31 @@
 /* base */
 *{ box-sizing:border-box; }
 html,body{ height:100%; }
-body{
-  margin:0;
-  font-family: "Nunito", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: 'Nunito', sans-serif;
   color: var(--text);
-  overflow-x:hidden;
-
-  /* 🌈 Zen Gradient Background (relativ zur Grundfarbe) */
-  background:
-    radial-gradient(1200px 700px at 10% 10%,
-      hsla(var(--h) calc(var(--s) + 10%) 86% / 0.55),
-      transparent 60%),
-    radial-gradient(900px 600px at 90% 15%,
-      hsla(calc(var(--h) + 35) calc(var(--s) + 18%) 84% / 0.35),
-      transparent 62%),
-    radial-gradient(1000px 800px at 70% 90%,
-      hsla(calc(var(--h) - 35) calc(var(--s) + 14%) 82% / 0.32),
-      transparent 60%),
-    radial-gradient(900px 900px at 20% 90%,
-      hsla(calc(var(--h) + 160) calc(var(--s) + 10%) 84% / 0.18),
-      transparent 62%),
-    linear-gradient(180deg,
-      hsl(var(--h) 25% 98%),
-      hsl(var(--h) 18% 96%));
-
-  /* zartes “Zen-Papier” Gefühl */
-  position: relative;
+  
+  /* Der kreisförmige Verlauf: Von Innen (heller) nach Außen (dunkler) */
+  background: radial-gradient(
+    circle at center, 
+    var(--primary-100) 0%, 
+    var(--primary-300) 30%,
+    var(--primary-700) 55%,
+    var(--primary-900) 100%
+  ) fixed;
+  
+  /* Damit der Hintergrund beim Scrollen feststeht */
+  background-attachment: fixed; 
+  
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  /* Die langsame Farbanimation bleibt erhalten */
+  animation: zenShift 18s ease-in-out infinite;
 }
-
 
 h1,h2{ letter-spacing: -0.02em; }
 
@@ -146,7 +143,7 @@ h1,h2{ letter-spacing: -0.02em; }
   height: 520px;
   border-radius: 50%;
   filter: blur(55px);
-  opacity: 0.45;
+  opacity: 0.3;  /* Wert verringern für subtilere Effekte */
   z-index: -1;
 }
 .orb-1{
@@ -552,4 +549,106 @@ body::before{
 
 body{
   animation: zenShift 18s ease-in-out infinite;
+}
+
+/* Optional: Damit das Licht in der Mitte beim Atmen leicht mitschwingt */
+body.breathing-bg {
+  animation: pulseBg 8s ease-in-out infinite;
+}
+
+@keyframes pulseBg {
+  0%, 100% { filter: brightness(100%); }
+  50% { filter: brightness(115%); }
+}
+
+/* Modal Styling */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+.modal-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal {
+  width: min(400px, 90vw);
+  border-radius: var(--radius);
+  padding: 24px;
+  transform: scale(0.9) translateY(20px);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-overlay.open .modal {
+  transform: scale(1) translateY(0);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.modal-header h3 { margin: 0; font-weight: 900; font-size: 22px; }
+
+.btn-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--text);
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+
+.btn-close:hover { opacity: 1; }
+
+.control-group { margin-bottom: 20px; }
+.btn-full { width: 100%; margin-top: 10px; }
+
+/* Timer Anzeige Styling */
+.timer-display {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 10px;
+  color: var(--primary-500);
+  font-variant-numeric: tabular-nums;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.timer-display.active {
+  opacity: 1;
+}
+
+/* Den Kreis etwas nach unten schieben, falls der Timer aktiv ist */
+.breath-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Zahnrad Animation */
+#btnSettings { font-size: 1.2rem; transition: transform 0.6s ease; }
+#btnSettings:hover { transform: rotate(120deg); }
+
+#btnMusic {
+  min-width: 110px;
+  transition: all 0.3s ease;
+}
+
+#btnMusic.btn-primary {
+  background: var(--primary-500);
+  color: var(--on-btn);
+  border-color: transparent;
 }
