@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Medizin-Buddha & Die Göttin Tara</title>
+  <style>
+    :root {
+      /* Theme 1: Zen Dark Lapis / Warm Gold (Default) */
+      --bg-color: #12151c;
+      --card-bg: #1a1e29;
+      --text-main: #e2e8f0;
+      --text-muted: #94a3b8;
+      --accent: #d97706;
+      --accent-hover: #b45309;
+      --accent-light: rgba(217, 119, 6, 0.15);
+      --border-color: #2e3646;
+      --header-bg: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      --container-shadow: 0 20px 40px rgba(0,0,0,0.5);
+      --font-family: 'Georgia', 'Cambria', serif;
+    }
+    
+    [data-theme="zen-light"] {
+      /* Theme 2: Soft Sand / Zen Garden Light */
+      --bg-color: #f4f1ea;
+      --card-bg: #ffffff;
+      --text-main: #2d3748;
+      --text-muted: #718096;
+      --accent: #9b6a2f;
+      --accent-hover: #7b5220;
+      --accent-light: rgba(155, 106, 47, 0.12);
+      --border-color: #e2e8f0;
+      --header-bg: linear-gradient(135deg, #efebe4 0%, #e5dfd3 100%);
+      --container-shadow: 0 15px 35px rgba(0,0,0,0.06);
+    }
+    
+    [data-theme="emerald"] {
+      /* Theme 3: Deep Forest & Emerald Tara */
+      --bg-color: #0b1a17;
+      --card-bg: #122824;
+      --text-main: #e6f4f1;
+      --text-muted: #80b3a8;
+      --accent: #10b981;
+      --accent-hover: #059669;
+      --accent-light: rgba(16, 185, 129, 0.15);
+      --border-color: #1e3e38;
+      --header-bg: linear-gradient(135deg, #0d2c25 0%, #061713 100%);
+      --container-shadow: 0 20px 40px rgba(0,0,0,0.6);
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      transition: background-color 0.4s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    body {
+      font-family: var(--font-family);
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      line-height: 1.8;
+      padding: 40px 20px;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+    
+    /* Controls Bar */
+    .controls-bar {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      display: flex;
+      gap: 10px;
+      background: var(--card-bg);
+      padding: 8px 14px;
+      border-radius: 30px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+    
+    .btn {
+      background: transparent;
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-family: system-ui, -apple-system, sans-serif;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      outline: none;
+    }
+    
+    .btn:hover {
+      background-color: var(--accent-light);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    
+    /* Main Container */
+    .zen-container {
+      max-width: 800px;
+      width: 100%;
+      background-color: var(--card-bg);
+      border-radius: 16px;
+      padding: 50px 60px;
+      box-shadow: var(--container-shadow);
+      border: 1px solid var(--border-color);
+      margin-top: 20px;
+      margin-bottom: 40px;
+    }
+    
+    /* Header & Typography */
+    .zen-header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding-bottom: 30px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .zen-symbol {
+      font-size: 32px;
+      margin-bottom: 10px;
+      color: var(--accent);
+      opacity: 0.9;
+    }
+    
+    h1 {
+      font-size: 2.2rem;
+      font-weight: normal;
+      color: var(--accent);
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+    
+    .subtitle {
+      font-size: 1.3rem;
+      font-style: italic;
+      color: var(--text-muted);
+      margin-bottom: 0;
+    }
+    
+    h2 {
+      font-size: 1.5rem;
+      font-weight: normal;
+      color: var(--accent);
+      margin-top: 40px;
+      margin-bottom: 20px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    h3 {
+      font-size: 1.2rem;
+      color: var(--text-main);
+      margin-top: 25px;
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+    
+    p {
+      margin-bottom: 18px;
+      font-size: 1.05rem;
+      color: var(--text-main);
+    }
+    
+    hr {
+      border: none;
+      height: 1px;
+      background: var(--border-color);
+      margin: 40px 0;
+    }
+    
+    /* Lists */
+    ul, ol {
+      margin-bottom: 24px;
+      padding-left: 24px;
+    }
+    
+    li {
+      margin-bottom: 12px;
+      font-size: 1.05rem;
+    }
+    
+    li p {
+      margin-bottom: 0;
+    }
+    
+    /* Highlight Cards / Quote Blocks */
+    .zen-card {
+      background-color: var(--accent-light);
+      border-left: 4px solid var(--accent);
+      border-radius: 0 12px 12px 0;
+      padding: 24px 28px;
+      margin: 30px 0;
+    }
+    
+    .zen-card h3 {
+      margin-top: 0;
+      color: var(--accent);
+    }
+    
+    .zen-card blockquote {
+      margin: 0;
+      font-style: italic;
+      font-size: 1.1rem;
+      line-height: 1.7;
+      color: var(--text-main);
+    }
+    
+    .mantra-badge {
+      display: inline-block;
+      background-color: var(--accent);
+      color: #ffffff;
+      padding: 8px 18px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-style: normal;
+      letter-spacing: 0.5px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      body {
+        padding: 15px 10px;
+      }
+      .zen-container {
+        padding: 30px 20px;
+      }
+      h1 {
+        font-size: 1.8rem;
+      }
+      .controls-bar {
+        top: 10px;
+        right: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Controls for Theme & Fullscreen -->
+  <div class="controls-bar">
+    <button class="btn" onclick="toggleTheme()" title="Stil / Theme wechseln">
+      🎨 <span id="theme-label">Zen Dunkel</span>
+    </button>
+    <button class="btn" onclick="toggleFullscreen()" title="Vollbild umschalten">
+      ⛶ <span id="fullscreen-label">Vollbild</span>
+    </button>
+  </div>
+
+  <div class="zen-container" id="content-container">
+
+    <!-- Header Section -->
+    <div class="zen-header">
+      <div class="zen-symbol">🧘 • 🪷</div>
+      <h1>Medizin-Buddha (Bhaisajyaguru)</h1>
+      <div class="subtitle">„Teyata Om Bekandze Bekandze Maha Bekandze Radza Samudgate Soha“</div>
+    </div>
+
+    <p>Das ist das kraftvolle Mantra des <strong>Medizin-Buddhas</strong> (<em>Bhaisajyaguru</em>). In der tibetisch-buddhistischen Tradition gilt es als eines der bedeutendsten Mantras für Heilung, Reinigung und Transformation – und zwar nicht nur für körperliche Leiden, sondern vor allem für den Geist.</p>
+
+    <hr>
+
+    <h2>Die Übersetzung &amp; Bedeutung im Detail</h2>
+    <p>Das Mantra stammt aus dem Sanskrit. Aufgeschlüsselt bedeuten die einzelnen Worte Folgendes:</p>
+
+    <ul>
+      <li>
+        <p><strong>Teyata</strong> (<em>Tadyathā</em>): „So ist es“, „Es ist wie folgt“ oder „Ebenso gesprochen“. Es leitet das Mantra ein und bereitet den Geist vor.</p>
+      </li>
+      <li>
+        <p><strong>Om</strong>: Der urfängliche Klang des Universums, der Körper, Rede und Geist mit dem Erleuchtungszustand verbindet.</p>
+      </li>
+      <li>
+        <p><strong>Bekandze</strong>: „Den Schmerz beseitigen“ oder „Heilung“.</p>
+      </li>
+      <li>
+        <p>Das <em>erste Bekandze</em> steht oft für das Lindern von <strong>körperlichem Schmerz</strong> und Leiden (wie Krankheit und Verletzungen).</p>
+      </li>
+      <li>
+        <p>Das <em>zweite Bekandze</em> steht für das Beseitigen der <strong>geistigen Ursachen</strong> von Leiden – also der primären Gifte im Geist (Gier, Hass, Unwissenheit und Täuschung).</p>
+      </li>
+      <li>
+        <p><strong>Maha Bekandze</strong>: „Die <em>große</em> Beseitigung des Schmerzes“. Es bezieht sich auf das endgültige Auflösen aller feinstofflichen Schleier und Karma-Spatzen, die uns an den Kreislauf des Leidens binden.</p>
+      </li>
+      <li>
+        <p><strong>Radza</strong> (<em>Rāja</em>): „König“. Es verweist auf den Medizin-Buddha als den König der Heilkunst.</p>
+      </li>
+      <li>
+        <p><strong>Samudgate</strong>: „Hervorgegangen“, „Höchste Erhebung“ oder „Erreicht“.</p>
+      </li>
+      <li>
+        <p><strong>Soha</strong> (<em>Svāhā</em>): „So sei es“, „Möge die Bedeutung in meinem Herzen Wurzeln schlagen“. Es besiegelt die Segnungen.</p>
+      </li>
+    </ul>
+
+    <!-- Highlighted Meaning Box -->
+    <div class="zen-card">
+      <h3>Bedeutung</h3>
+      <p style="margin-bottom: 10px;"><strong>Zusammengefasst bedeutet es etwa:</strong></p>
+      <blockquote style="margin-top: 10px;">
+        <em>„Mögen die Leiden der Krankheit, der Unwissenheit und des Geistes beseitigt werden. Ehre dem König der Heilung, der uns zum höchsten Zustand der Befreiung führt. So sei es.“</em>
+      </blockquote>
+    </div>
+
+    <hr>
+
+    <h2>Der tiefere Hintergrund</h2>
+    <p>Im Buddhismus wird Krankheit oft nicht isoliert betrachtet, sondern als ein Zusammenspiel von körperlichen Faktoren und geistigen Haltungen. Der Medizin-Buddha wird in Visualisierungen tiefblau dargestellt – in der Farbe des echten Lapis Lazuli, der für reinigende Klarheit und Ruhe steht.</p>
+    <p>Wenn man dieses Mantra rezitiert oder ihm lauscht, geht es vor allem um zwei Aspekte:</p>
+    <ol>
+      <li><strong>Mitgefühl &amp; Absicht (Bodhicitta):</strong> Man wünscht nicht nur sich selbst Heilung, sondern allen lebenden Wesen, die Schmerz empfinden.</li>
+      <li><strong>Geistige Klarheit:</strong> Es wirkt wie eine sanfte Schwingung, die den unruhigen Geist beruhigt, Spannungen löst und Raum für Selbstheilungskräfte schafft.</li>
+    </ol>
+    <p>Es passt wundervoll zu Achtsamkeitspraxis und ruhigen Auszeiten. Möchtest du tiefer in die Visualisierung eintauchen, die traditionell mit diesem Mantra verbunden wird, oder spricht dich einfach der Klang und die Ruhe der Rezitation an?</p>
+
+    <hr>
+
+    <!-- Section: Die Göttin Tara -->
+    <div style="text-align: center; margin-top: 50px; margin-bottom: 30px;">
+      <div class="zen-symbol">🪷</div>
+      <h1 style="font-size: 2rem;">Die Göttin Tara</h1>
+    </div>
+
+    <p>Die Göttin <strong>Tara</strong> (auf Tibetisch: <em>Jetsun Dolma</em>) ist eine der liebenswertesten, verzauberndsten und zugleich kraftvollsten Gestalten des tibetischen Buddhismus. Während der Medizin-Buddha für die tiefgreifende Heilung steht, verkörpert Tara das <strong>aktive Mitgefühl</strong>, den Schutz und die rasche Hilfe. Ihr Name bedeutet übersetzt „Retterin“ oder „Befreierin“, aber auch „Stern“ – sie gilt als das Licht, das den Menschen hilft, den Ozean des Leidens zu überqueren.</p>
+
+    <hr>
+
+    <h2>Die Legende ihrer Entstehung</h2>
+    <p>Es gibt eine wunderschöne Geschichte über die Geburt von Tara:</p>
+
+    <div class="zen-card">
+      <blockquote style="font-size: 1.05rem;">
+        🧘 • 🪷 Der Bodhisattva des Mitgefühls, <strong>Avalokiteshvara</strong>, blickte auf die Welt hinab und sah das unermessliche Leid aller Wesen. Er war so tief bewegt, dass er versprach, niemanden zurückzulassen. Doch als er sah, wie unendlich groß die Not war, vergoss er Tränen der Trauer und der Liebe.
+        Aus seinen Tränen bildete sich ein See, und auf dem See erwuchs eine wunderschöne Lotusblüte. Als sie sich öffnete, entstieg ihr Tara – geboren aus den Tränen des reinen Mitgefühls, um ihm bei seiner Aufgabe beizustehen.
+
+      </blockquote>
+    </div>
+    <div class="zen-card">
+      <blockquote style="font-size: 1.05rem;">
+        🧘 • 🪷 Eine andere Überlieferung erzählt, dass Tara einst eine Prinzessin namens <strong>Yeshe Dawa</strong> („Mond der Weisheit“) war. Als Mönche ihr rieten, für eine Wiedergeburt als Mann zu beten, um die Erleuchtung zu erlangen, lehnte sie das lächelnd ab. Sie erkannte, dass Erleuchtung weder männlich noch weiblich ist, und legte das Versprechen ab, für immer in einem weiblichen Körper zu wirken, um allen Wesen zu helfen.
+      </blockquote>
+    </div>
+    <hr>
+
+    <h2>Die vielen Erscheinungsformen: Die 21 Taras</h2>
+    <p>Tara zeigt sich in 21 Hauptformen, die jeweils unterschiedliche Qualitäten, Farben und Aufgaben haben. Die beiden bekanntesten sind:</p>
+
+    <h3>1. Die Grüne Tara (<em>Arya Tara</em>)</h3>
+    <p>Sie ist die bekannteste und dynamischste Form. Grün steht für Leben, Aktivität, Natur und schnelle Energie.</p>
+    <ul>
+      <li><strong>Haltung:</strong> Sie sitzt auf einem Lotus, aber ihr rechtes Bein ist leicht nach vorne ausgestreckt – bereit, jeden Augenblick aufzuspringen, um zu helfen.</li>
+      <li><strong>Wirkung:</strong> Sie schützt vor den „acht großen Ängsten“ (sowohl äußeren Gefahren wie Unwettern als auch inneren Hindernissen wie Stolz, Zweifel, Wut und Eifersucht).</li>
+    </ul>
+
+    <h3>2. Die Weiße Tara (<em>Sitamani Tara</em>)</h3>
+    <p>Sie verkörpert Mütterlichkeit, Langlebigkeit, Mitgefühl und die kühle, heilende Energie des Mondes.</p>
+    <ul>
+      <li><strong>Besonderheit:</strong> Sie wird oft mit sieben Augen dargestellt – zwei an den normalen Stellen, eines auf der Stirn und jeweils eines in den Handflächen und Fußsohlen. Damit sieht sie das Leid in allen Welten und Winkeln der Existenz.</li>
+      <li><strong>Wirkung:</strong> Sie spendet Gesundheit, schenkt ein hohes Alter und hilft, geistige Blockaden sanft aufzulösen.</li>
+    </ul>
+
+    <hr>
+
+    <h2>Das Mantra der Grünen Tara</h2>
+    <p>Das Mantra der Grünen Tara ist weltberühmt für seinen melodischen, beruhigenden Klang:</p>
+
+    <div style="text-align: center; margin: 25px 0;">
+      <span class="mantra-badge">🧘 • 🪷 Om Tare Tuttare Ture Soha</span>
+    </div>
+
+    <ul>
+      <li><strong>Om</strong>: Verbindung mit dem Kosmos und der Erleuchtung.</li>
+      <li><strong>Tare</strong>: Befreiung von weltlichen Leiden und äußeren Gefahren.</li>
+      <li><strong>Tuttare</strong>: Befreiung von den inneren Ängsten und Geistesgiften.</li>
+      <li><strong>Ture</strong>: Befreiung von Unwissenheit und körperlicher/geistiger Trägheit.</li>
+      <li><strong>Soha</strong>: Möge die Segnung in meinem Herzen verankert bleiben.</li>
+    </ul>
+
+    <hr>
+
+    <h2>Warum Tara so besonders inspiriert</h2>
+    <p>Tara ist keine weit entfernte, unnahbare Gottheit. In der Kunst und Meditation spürt man bei ihr eine spürbare Wärme, Zugänglichkeit und unerschütterliche Mutterschaft. Sie erinnert uns daran, dass Mitgefühl kein passives Gefühl ist, sondern eine lebendige, active Kraft, die ermutigt und beschützt.</p>
+
+    <div>
+
+      <h2>
+        Yeshe Dawa - Tara.
+      </h2>
+
+      <p><strong>Yeshe Dawa</strong> (tibetisch für <em>„Mond der ursprünglichen Weisheit“</em>, auf Sanskrit <em>Jñānacandra</em>) ist im tibetischen Buddhismus die zentrale historische und mythische Gestalt, aus der die weibliche Bodhisattva und Buddha-Figur <strong>Tara</strong> hervorging. Ihre Überlieferung ist einer der bedeutendsten Texte zur Gleichberechtigung aller Wesen auf dem geistigen Weg.</p>
+      <hr>
+      <h3>Die Legende und ihr Leben</h3>
+      <p>Nach der klassischen Überlieferung lebte Prinzessin Yeshe Dawa vor vielen Äonen in einem früheren Weltalter. Sie zeichnete sich durch große spirituelle Hingabe und Weisheit aus.</p>
+      <ul>
+        <li><strong>Erweckung des Bodhicitta:</strong> Über Äonen hinweg brachte sie dem damaligen Buddha <em>Tonyo Drupa</em> und dessen Gefolge unermessliche Gaben dar. Durch ihre tiefgreifende spirituelle Praxis erweckte sie <em>Bodhicitta</em> – den Geist des Erleuchtungsstrebens aus Mitgefühl für alle empfindsamen Wesen.</li>
+        <li><strong>Das Aufbegehren gegen Geschlechterklischees:</strong> Als eine Gruppe von Mönchen und Meistern ihren hohen spirituellen Verwirklichungsgrad erkannte, rieten sie ihr, darum zu beten, in ihrem nächsten Leben in einem <strong>männlichen Körper</strong> wiedergeboren zu werden. Nach damaliger patriarchaler Auffassung galt die Erreichung der vollständigen Buddhaschaft nur in einer männlichen Form als möglich.</li>
+        <li><strong>Erkenntnis der Nicht-Dualität:</strong> Yeshe Dawa wies diesen Rat bestimmt zurück. Sie wies darauf hin, dass auf der Ebene der absoluten Wahrheit (<em>Sūnyatā</em> / Leere) Bezeichnungen wie „männlich“ oder „weiblich“, „Selbst“ oder „Person“ keine reale Substanz besitzen.</li>
+      </ul>
+      <hr>
+      <h3>Das historische Gelübde</h3>
+      <p>Angesichts der Tatsache, dass sich die meisten Buddhas in männlicher Form zeigten, legte Prinzessin Yeshe Dawa ein historisches Versprechen ab:</p>
+      <blockquote>
+        <p><em>„Es gibt viele, die in einem männlichen Körper nach Erleuchtung streben, aber nur wenige, die das Wohl der Wesen in der Gestalt einer Frau wirken. Daher gelobe ich, bis zum Ende von Samsara ausschließlich in einem weiblichen Körper als Bodhisattva zum Wohle aller Wesen zu wirken.“</em></p>
+      </blockquote>
+      <hr>
+      <h3>Ihre Erleuchtung und ihr Wirken</h3>
+      <p>Nach diesem Gelübde zog sich Yeshe Dawa in tiefe Meditation zurück. Durch ihre unerschütterliche Praxis befreite sie täglich unzählige Wesen aus dem Kreislauf des Leidens.</p>
+      <ul>
+        <li><strong>Manifestation als Tara:</strong> Aufgrund ihrer Vollendung wurde sie schließlich als Erleuchtete anerkannt und erhielt den Namen <strong>Tara</strong> (tibetisch <em>Jetsun Dolma</em>, die „Befreierin“ oder „Retterin“).</li>
+        <li><strong>Symbolik:</strong> Als Befreierin steht sie für schnelles, aktives Mitgefühl und Schutz vor den sogenannten <em>acht großen Ängsten</em> (wie Stolz, Unwissenheit, Zorn und Eifersucht).</li>
+      </ul>
+      <p>Yeshe Dawas Geschichte gilt bis heute im Buddhismus als zeitloses Manifest für das vollkommene Erleuchtungspotenzial aller Wesen – unabhängig von Geschlecht oder äußerer Form.</p>
+
+    </div>
+
+
+  </div>
+
+
+  <script>
+    const themes = [{
+        id: '',
+        label: 'Zen Dunkel'
+      },
+      {
+        id: 'zen-light',
+        label: 'Zen Hell'
+      },
+      {
+        id: 'emerald',
+        label: 'Smaragd Tara'
+      }
+    ];
+    let currentThemeIdx = 0;
+
+    function toggleTheme() {
+      currentThemeIdx = (currentThemeIdx + 1) % themes.length;
+      const theme = themes[currentThemeIdx];
+
+      if (theme.id) {
+        document.documentElement.setAttribute('data-theme', theme.id);
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+      }
+
+      document.getElementById('theme-label').innerText = theme.label;
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+          alert(`Fehler beim Aktivieren des Vollbildmodus: ${err.message}`);
+        });
+        document.getElementById('fullscreen-label').innerText = 'Beenden';
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+          document.getElementById('fullscreen-label').innerText = 'Vollbild';
+        }
+      }
+    }
+  </script>
+</body>
+</html>
