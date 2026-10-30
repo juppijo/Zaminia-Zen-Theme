@@ -58,19 +58,38 @@ input[type=range]{width:100%;accent-color:var(--a1);height:22px}
 .camBox{max-width:760px;width:100%;display:flex;flex-direction:column;gap:12px}#vid{width:100%;max-height:70vh;background:#000;border-radius:14px;object-fit:contain}
 .flt{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:10px 0}.flt button{border:1px solid var(--border);background:var(--panel);color:var(--text);border-radius:12px;padding:7px 2px;font:inherit;font-size:12px;cursor:pointer;transition:transform .12s}.flt button:hover{transform:translateY(-1px)}.flt button.act{background:linear-gradient(135deg,var(--a1),var(--a2));color:#fff;border-color:transparent}.flt span{display:block;font-size:20px}
 @media(max-width:760px){aside{position:absolute;right:0;top:0;bottom:0;width:min(330px,88vw);z-index:4;box-shadow:-10px 0 30px rgba(0,0,0,.5)}aside.closed{margin-right:calc(-1 * min(331px,89vw))}h1{font-size:15px}.btn{padding:7px 11px}}
+:root{padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+@supports(height:100dvh){html,body{height:100dvh}}
+button{touch-action:manipulation;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
+#stage{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+@media(max-width:760px){
+ header{flex-wrap:nowrap;overflow-x:auto;gap:6px;padding:8px 10px;scrollbar-width:none}header::-webkit-scrollbar{display:none}
+ header .btn{flex-shrink:0;min-height:42px;padding:8px 12px}.lb{display:none}
+ h1{display:none}
+ main{flex-direction:column}
+ aside{position:relative;right:auto;top:auto;bottom:auto;width:100%;max-height:46%;z-index:auto;box-shadow:none;border-left:0;border-top:1px solid var(--border);margin:0;padding:10px}
+ aside.closed{display:none;margin:0}
+ canvas{max-width:98%;max-height:98%}
+ input[type=range]{height:32px}
+ .sl{margin:12px 0}
+ summary{padding:13px 14px}
+ .flt button{padding:10px 2px}
+ .seg button{padding:11px 4px}
+ #status,#chip{font-size:11px;bottom:8px}#status{left:8px}#chip{right:8px}
+}
 </style>
 </head>
 <body>
 <header>
  <h1><span class="logo"><i style="background:#f33"></i><i style="background:#3f5"></i><i style="background:#38f"></i></span> RGB Farbkanäle</h1>
- <button class="btn pri" id="bLoad">📂 Bild laden</button>
- <button class="btn pri" id="bCam">📷 Kamera</button>
- <button class="btn" id="bPick">💧 Pipette</button>
- <button class="btn pri" id="bSave">💾 PNG speichern</button>
- <button class="btn pri" id="bJpg">🖼 JPG speichern</button>
- <button class="btn" id="bTheme">🎨 Styles</button>
- <button class="btn" id="bFs">⛶ Vollbild</button>
- <button class="btn" id="bPanel">⚙ Regler</button>
+ <button class="btn pri" id="bLoad">📂<span class="lb"> Bild laden</span></button>
+ <button class="btn pri" id="bCam">📷<span class="lb"> Kamera</span></button>
+ <button class="btn" id="bPick">💧<span class="lb"> Pipette</span></button>
+ <button class="btn pri" id="bSave">💾 PNG<span class="lb"> speichern</span></button>
+ <button class="btn pri" id="bJpg">🖼 JPG<span class="lb"> speichern</span></button>
+ <button class="btn" id="bTheme">🎨<span class="lb"> Styles</span></button>
+ <button class="btn" id="bFs">⛶<span class="lb"> Vollbild</span></button>
+ <button class="btn" id="bPanel">⚙<span class="lb"> Regler</span></button>
  <input type="file" id="file" accept="image/*" hidden>
 </header>
 <main>
@@ -104,7 +123,7 @@ input[type=range]{width:100%;accent-color:var(--a1);height:22px}
   <details><summary>Bild &amp; Ansicht</summary><div class="body"><div id="adj"></div>
    <div class="row"><button class="btn" id="bFit">Einpassen</button><button class="btn" id="bReset">Zurücksetzen</button></div>
    <div class="row" style="margin-top:8px"><button class="btn" id="bOrig">👁 Original halten</button></div>
-   <p class="hint">Mausrad = Zoom, Ziehen = Verschieben. Bild per Drag &amp; Drop möglich.</p>
+   <p class="hint">Mausrad bzw. 2 Finger = Zoom, Ziehen = Verschieben. Bild per Drag &amp; Drop möglich.</p>
   </div></details>
  </aside>
 </main>
@@ -284,6 +303,16 @@ stage.addEventListener('pointerdown',e=>{if(st.cmp!=='off'&&!pick){drag=null;cdr
 stage.addEventListener('pointermove',e=>{if(cdrag)cposSet(e)});
 ['pointerup','pointercancel'].forEach(ev=>stage.addEventListener(ev,()=>{cdrag=false}));
 syncX();
+/* Touch / Smartphone */
+const pts=new Map();let pd=0,pm=null,lastS=null;
+const pinC=()=>{const[a,b]=[...pts.values()];return[Math.hypot(a.x-b.x,a.y-b.y),(a.x+b.x)/2,(a.y+b.y)/2]};
+stage.addEventListener('pointerdown',e=>{pts.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pts.size>=2){drag=null;cdrag=false;const c=pinC();pd=c[0];pm={x:c[1],y:c[2]}}else if(pick&&e.pointerType==='touch'){drag=null}});
+stage.addEventListener('pointermove',e=>{if(!pts.has(e.pointerId))return;pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ if(pts.size===2){const[d,mx,my]=pinC();if(pd&&pm){st.zoom=Math.round(Math.max(25,Math.min(400,st.zoom*d/pd)));ins.zoom[0].value=st.zoom;ins.zoom[1].textContent=st.zoom+'%';px+=mx-pm.x;py+=my-pm.y;view()}pd=d;pm={x:mx,y:my}}
+ else if(pick&&e.pointerType==='touch'){lastS=sample(e);if(lastS)show(lastS)}});
+['pointerup','pointercancel'].forEach(ev=>stage.addEventListener(ev,e=>{pts.delete(e.pointerId);pd=0;pm=null;if(ev==='pointerup'&&pick&&e.pointerType==='touch'&&lastS){const h=hex(...lastS.o);if(!pins.includes(h)){pins.push(h);if(pins.length>12)pins.shift();drawPins()}}lastS=null}));
+orig.oncontextmenu=e=>e.preventDefault();
+if(!document.documentElement.requestFullscreen)$('#bFs').style.display='none';
 $('#hl').classList.add('off');demo();
 </script>
 </body>
