@@ -77,6 +77,7 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent;-webkit
  .seg button{padding:11px 4px}
  #status,#chip{font-size:11px;bottom:8px}#status{left:8px}#chip{right:8px}
 }
+.szrow{display:flex;gap:8px;align-items:flex-end;margin:10px 0}.szrow label{flex:1;font-size:12px;color:var(--muted)}.szrow span{padding-bottom:10px;color:var(--muted)}.szrow input{width:100%;margin-top:4px;padding:9px;border-radius:10px;border:1px solid var(--border);background:var(--panel);color:var(--text);font:inherit;font-size:16px}.chk{display:flex;gap:8px;align-items:center;font-size:13px;margin:8px 0}.chk input{width:18px;height:18px;accent-color:var(--a1)}
 </style>
 </head>
 <body>
@@ -119,6 +120,14 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent;-webkit
    <div class="flt" id="flts"></div>
    <div id="fs"></div>
    <p class="hint">Vergleich: Trennlinie per Regler oder direkt im Bild ziehen (Verschieben ist dann pausiert). Gespeichert wird immer nur das Nachher-Bild.</p>
+  </div></details>
+  <details><summary>Bildgröße</summary><div class="body">
+   <div class="seg" id="szu"><button data-u="px" class="act">Pixel</button><button data-u="%">Prozent</button></div>
+   <div class="szrow"><label>Breite<input type="number" id="szw" min="1" inputmode="numeric"></label><span>×</span><label>Höhe<input type="number" id="szh" min="1" inputmode="numeric"></label></div>
+   <label class="chk"><input type="checkbox" id="szl" checked> Seitenverhältnis beibehalten</label>
+   <div class="row"><button class="btn pri" id="szA">Anwenden</button><button class="btn" id="szR">Originalgröße</button></div>
+   <p class="hint" id="szi"></p>
+   <p class="hint">Prozent beziehen sich auf die Größe des geladenen Bildes. Gespeichert wird in der eingestellten Größe (max. 5000 px Kante, 16 Megapixel).</p>
   </div></details>
   <details><summary>Bild &amp; Ansicht</summary><div class="body"><div id="adj"></div>
    <div class="row"><button class="btn" id="bFit">Einpassen</button><button class="btn" id="bReset">Zurücksetzen</button></div>
@@ -176,9 +185,9 @@ function render(){
  ctx.putImageData(out,0,0);drawCmp();
  $('#status').textContent=`${cv.width}×${cv.height}px`+(m==='highlight'?` · hervorgehoben: ${(hit/(n/4)*100).toFixed(1)} %`:'');
 }
-function setImage(img){
- let w=img.naturalWidth||img.width,h=img.naturalHeight||img.height;const mx=3000,k=Math.min(1,mx/Math.max(w,h));w=Math.round(w*k);h=Math.round(h*k);
- cv.width=w;cv.height=h;ctx.drawImage(img,0,0,w,h);src=ctx.getImageData(0,0,w,h);out=ctx.createImageData(w,h);oc.width=w;oc.height=h;oc.getContext('2d').putImageData(src,0,0);px=py=0;st.zoom=100;ins.zoom[0].value=100;ins.zoom[1].textContent='100%';view();render()}
+function setImage(img,keep){
+ let w=img.naturalWidth||img.width,h=img.naturalHeight||img.height;const mx=keep?5000:3000,k=Math.min(1,mx/Math.max(w,h));w=Math.round(w*k);h=Math.round(h*k);
+ cv.width=w;cv.height=h;ctx.drawImage(img,0,0,w,h);src=ctx.getImageData(0,0,w,h);out=ctx.createImageData(w,h);oc.width=w;oc.height=h;oc.getContext('2d').putImageData(src,0,0);if(!keep){base=document.createElement('canvas');base.width=w;base.height=h;base.getContext('2d').drawImage(oc,0,0);szFill()}px=py=0;st.zoom=100;ins.zoom[0].value=100;ins.zoom[1].textContent='100%';view();render()}
 function demo(){
  const c=document.createElement('canvas');c.width=900;c.height=600;const x=c.getContext('2d');
  const g=x.createLinearGradient(0,0,900,600);g.addColorStop(0,'#1d2a55');g.addColorStop(1,'#d9a05b');x.fillStyle=g;x.fillRect(0,0,900,600);
@@ -313,6 +322,22 @@ stage.addEventListener('pointermove',e=>{if(!pts.has(e.pointerId))return;pts.set
 ['pointerup','pointercancel'].forEach(ev=>stage.addEventListener(ev,e=>{pts.delete(e.pointerId);pd=0;pm=null;if(ev==='pointerup'&&pick&&e.pointerType==='touch'&&lastS){const h=hex(...lastS.o);if(!pins.includes(h)){pins.push(h);if(pins.length>12)pins.shift();drawPins()}}lastS=null}));
 orig.oncontextmenu=e=>e.preventDefault();
 if(!document.documentElement.requestFullscreen)$('#bFs').style.display='none';
+/* Bildgröße */
+let base=null,szu='px';
+function szFill(){if(!base)return;const w=cv.width,h=cv.height;
+ if(szu==='px'){$('#szw').value=w;$('#szh').value=h}else{$('#szw').value=Math.round(w/base.width*100);$('#szh').value=Math.round(h/base.height*100)}
+ $('#szi').textContent=`Aktuell: ${w} × ${h} px · Original: ${base.width} × ${base.height} px`}
+function szGet(){const a=+$('#szw').value,b=+$('#szh').value;return szu==='px'?[a,b]:[base.width*a/100,base.height*b/100]}
+document.querySelectorAll('#szu button').forEach(btn=>btn.onclick=()=>{if(!base)return;const[w,h]=szGet();szu=btn.dataset.u;document.querySelectorAll('#szu button').forEach(x=>x.classList.toggle('act',x===btn));
+ if(szu==='px'){$('#szw').value=Math.round(w);$('#szh').value=Math.round(h)}else{$('#szw').value=Math.round(w/base.width*100);$('#szh').value=Math.round(h/base.height*100)}});
+$('#szw').oninput=()=>{if(!base||!$('#szl').checked)return;const v=+$('#szw').value;$('#szh').value=szu==='px'?Math.round(v*base.height/base.width):v};
+$('#szh').oninput=()=>{if(!base||!$('#szl').checked)return;const v=+$('#szh').value;$('#szw').value=szu==='px'?Math.round(v*base.width/base.height):v};
+$('#szA').onclick=()=>{if(!base)return;let[w,h]=szGet().map(Math.round);if(!(w>=1&&h>=1))return toast('Bitte gültige Größe eingeben');
+ const k=Math.min(1,5000/Math.max(w,h),Math.sqrt(1.6e7/(w*h)));let lim=false;if(k<1){w=Math.max(1,Math.round(w*k));h=Math.max(1,Math.round(h*k));lim=true}
+ const t=document.createElement('canvas');t.width=w;t.height=h;const x=t.getContext('2d');x.imageSmoothingEnabled=true;x.imageSmoothingQuality='high';x.drawImage(base,0,0,w,h);
+ setImage(t,true);szFill();toast(lim?`Auf ${w} × ${h} px begrenzt`:`Größe: ${w} × ${h} px`)};
+$('#szR').onclick=()=>{if(base){setImage(base,true);szFill();toast('Originalgröße')}};
+['#szw','#szh'].forEach(s=>$(s).addEventListener('keydown',e=>{if(e.key==='Enter')$('#szA').click()}));
 $('#hl').classList.add('off');demo();
 </script>
 </body>
