@@ -2,210 +2,438 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RGB & Farb-Highlight Analyse-App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>RGB Studio & Farb-Analysator</title>
     <style>
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
         }
 
         body, html {
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background-color: #0f172a;
-            color: #f8fafc;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #0b0f19;
+            color: #f1f5f9;
         }
 
-        #app-container {
-            position: relative;
-            width: 100vw;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        #canvas-wrapper {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: grab;
-            background: radial-gradient(circle, #1e293b 0%, #0f172a 100%);
-        }
-
-        #canvas-wrapper:active {
-            cursor: grabbing;
-        }
-
-        canvas {
-            display: block;
-            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.5);
-            image-rendering: crisp-edges;
-        }
-
-        /* Toggle Button für das Panel */
-        #toggle-panel-btn {
+        /* Top Header Navigation */
+        header {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            z-index: 100;
-            background: rgba(30, 41, 59, 0.85);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #f8fafc;
-            padding: 12px 16px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 600;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.3);
-            transition: all 0.2s ease;
-        }
-
-        #toggle-panel-btn:hover {
-            background: rgba(51, 65, 85, 0.95);
-            transform: scale(1.02);
-        }
-
-        /* Glassmorphism Bedienfeld */
-        #control-panel {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            width: 360px;
-            max-height: calc(100vh - 40px);
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 56px;
             background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 20px;
-            z-index: 99;
-            overflow-y: auto;
-            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.7);
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
-        }
-
-        #control-panel.collapsed {
-            transform: translateX(120%) scale(0.95);
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .panel-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding-bottom: 10px;
-        }
-
-        .panel-header h2 {
-            font-size: 1.15rem;
-            font-weight: 700;
-            letter-spacing: -0.025em;
-        }
-
-        .close-btn {
-            background: transparent;
-            border: none;
-            color: #94a3b8;
-            font-size: 1.25rem;
-            cursor: pointer;
-            padding: 4px;
-            border-radius: 6px;
-        }
-
-        .close-btn:hover {
-            color: #f8fafc;
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .section-group {
-            margin-bottom: 18px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            padding: 12px;
-        }
-
-        .section-group h3 {
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #94a3b8;
-            margin-bottom: 10px;
-        }
-
-        .btn-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-        }
-
-        .btn {
-            background: #3b82f6;
-            color: white;
-            border: none;
-            padding: 10px 12px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-align: center;
             display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            z-index: 30;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.05rem;
+            letter-spacing: 0.5px;
+        }
+
+        .logo-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #ef4444, #22c55e, #3b82f6);
+            display: flex;
+            align-items: center;
             justify-content: center;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+        }
+
+        .actions {
+            display: flex;
             align-items: center;
             gap: 6px;
         }
 
-        .btn:hover {
-            filter: brightness(1.1);
-            transform: translateY(-1px);
-        }
-
-        .btn-secondary {
-            background: #475569;
-        }
-
-        .btn-accent {
-            background: #8b5cf6;
-        }
-
-        .btn-success {
-            background: #10b981;
-        }
-
-        .btn-danger {
-            background: #ef4444;
-        }
-
-        /* Checkbox Toggles für RGB */
-        .toggle-row {
-            display: flex;
-            justify-content: space-between;
+        /* UI Buttons */
+        .btn {
+            background: rgba(30, 41, 59, 0.8);
+            color: #e2e8f0;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 7px 12px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
             align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .btn:hover {
+            background: rgba(51, 65, 85, 0.9);
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.25);
+        }
+
+        .btn-primary {
+            background: #4f46e5;
+            color: #fff;
+            border: none;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: #4338ca;
+        }
+
+        .btn-icon {
+            padding: 7px;
+            border-radius: 8px;
+        }
+
+        /* Save Dropdown Group */
+        .save-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .save-dropdown-menu {
+            position: absolute;
+            top: calc(100% + 6px);
+            right: 0;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            padding: 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(-8px);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 40;
+            min-width: 150px;
+        }
+
+        .save-dropdown-menu.show {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        .save-dropdown-item {
+            background: transparent;
+            border: none;
+            color: #e2e8f0;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: background 0.15s ease;
+        }
+
+        .save-dropdown-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+        }
+
+        /* Workspace & Canvas */
+        .workspace {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            padding-top: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #070a12;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 0);
+            background-size: 24px 24px;
+            overflow: hidden;
+            touch-action: none;
+            cursor: grab;
+        }
+
+        .workspace:active {
+            cursor: grabbing;
+        }
+
+        #mainCanvas {
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            border-radius: 4px;
+            transform-origin: center center;
+            transition: transform 0.05s ease-out;
+        }
+
+        /* Empty Placeholder Screen */
+        .empty-state {
+            position: absolute;
+            inset: 56px 0 0 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(7, 10, 18, 0.85);
+            z-index: 10;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .empty-card {
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 32px 24px;
+            border-radius: 16px;
+            max-width: 420px;
+            width: 100%;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .empty-card h2 {
+            font-size: 1.25rem;
             margin-bottom: 8px;
-            font-size: 0.95krem;
         }
 
-        .toggle-row:last-child {
-            margin-bottom: 0;
+        .empty-card p {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin-bottom: 24px;
+            line-height: 1.4;
         }
 
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+        }
+
+        /* Sidebar Glassmorphism Panel */
+        .panel {
+            position: absolute;
+            top: 68px;
+            right: 16px;
+            bottom: 16px;
+            width: 330px;
+            max-width: calc(100vw - 20px);
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            z-index: 25;
+            display: flex;
+            flex-direction: column;
+            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .panel.collapsed {
+            transform: translateX(360px);
+        }
+
+        .panel-header {
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .panel-header h3 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #94a3b8;
+        }
+
+        .panel-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .section-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #64748b;
+            margin-bottom: 8px;
+        }
+
+        /* Preset Filter Grid */
+        .presets-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+        }
+
+        .preset-btn {
+            background: rgba(30, 41, 59, 0.6);
+            color: #cbd5e1;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s ease;
+        }
+
+        .preset-btn:hover {
+            background: rgba(51, 65, 85, 0.9);
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .preset-btn.active {
+            background: #4f46e5;
+            color: #ffffff;
+            border-color: #6366f1;
+            box-shadow: 0 2px 8px rgba(79, 70, 229, 0.4);
+        }
+
+        /* RGB Toggle Buttons */
+        .rgb-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .rgb-btn {
+            padding: 10px 0;
+            border-radius: 10px;
+            border: 1px solid transparent;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+            background: rgba(30, 41, 59, 0.5);
+            color: #64748b;
+        }
+
+        .rgb-btn.red.active {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border-color: rgba(239, 68, 68, 0.4);
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.2);
+        }
+
+        .rgb-btn.green.active {
+            background: rgba(34, 197, 94, 0.15);
+            color: #22c55e;
+            border-color: rgba(34, 197, 94, 0.4);
+            box-shadow: 0 0 12px rgba(34, 197, 94, 0.2);
+        }
+
+        .rgb-btn.blue.active {
+            background: rgba(59, 130, 246, 0.15);
+            color: #3b82f6;
+            border-color: rgba(59, 130, 246, 0.4);
+            box-shadow: 0 0 12px rgba(59, 130, 246, 0.2);
+        }
+
+        /* Cards & Controls */
+        .card {
+            background: rgba(30, 41, 59, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .control-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.8rem;
+        }
+
+        /* Dimension Inputs Grid */
+        .dim-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .input-group label {
+            font-size: 0.7rem;
+            color: #94a3b8;
+        }
+
+        .input-group input {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #f8fafc;
+            padding: 6px 8px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            width: 100%;
+            outline: none;
+            font-family: monospace;
+        }
+
+        .input-group input:focus {
+            border-color: #6366f1;
+        }
+
+        .scale-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        /* Toggle Switch Component */
         .switch {
             position: relative;
-            display: inline-block;
-            width: 44px;
-            height: 24px;
+            width: 36px;
+            height: 20px;
+            flex-shrink: 0;
         }
 
         .switch input {
@@ -214,748 +442,1272 @@
             height: 0;
         }
 
-        .slider {
+        .slider-switch {
             position: absolute;
+            inset: 0;
+            background-color: #334155;
+            border-radius: 20px;
+            transition: .2s;
             cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #475569;
-            transition: .3s;
-            border-radius: 24px;
         }
 
-        .slider:before {
+        .slider-switch:before {
             position: absolute;
             content: "";
-            height: 18px;
-            width: 18px;
+            height: 14px;
+            width: 14px;
             left: 3px;
             bottom: 3px;
             background-color: white;
-            transition: .3s;
             border-radius: 50%;
+            transition: .2s;
         }
 
-        input:checked + .slider {
-            background-color: #3b82f6;
+        input:checked + .slider-switch {
+            background-color: #6366f1;
         }
 
-        input#toggle-r:checked + .slider { background-color: #ef4444; }
-        input#toggle-g:checked + .slider { background-color: #10b981; }
-        input#toggle-b:checked + .slider { background-color: #3b82f6; }
-
-        input:checked + .slider:before {
-            transform: translateX(20px);
+        input:checked + .slider-switch:before {
+            transform: translateX(16px);
         }
 
-        /* Regler & Sliders */
-        .slider-control {
-            margin-bottom: 10px;
-        }
-
-        .slider-control:last-child {
-            margin-bottom: 0;
-        }
-
-        .slider-control label {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.85rem;
-            color: #cbd5e1;
-            margin-bottom: 4px;
-        }
-
-        .slider-control input[type="range"] {
-            width: 100%;
-            accent-color: #3b82f6;
-            cursor: pointer;
-        }
-
-        /* Isolations-Info & Vorschau */
-        #isolation-preview-box {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 8px;
-        }
-
-        #color-preview-sample {
-            width: 28px;
-            height: 28px;
-            border-radius: 6px;
-            border: 1px solid rgba(255,255,255,0.3);
-            background: #000;
-        }
-
-        /* Resize Inputs */
-        .resize-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-bottom: 8px;
-        }
-
-        .input-group {
+        /* Range Slider */
+        .range-wrap {
             display: flex;
             flex-direction: column;
             gap: 4px;
         }
 
-        .input-group label {
+        .range-header {
+            display: flex;
+            justify-content: space-between;
             font-size: 0.75rem;
             color: #94a3b8;
         }
 
-        .input-group input, .input-group select {
-            background: rgba(255,255,255,0.07);
-            border: 1px solid rgba(255,255,255,0.15);
-            color: #fff;
-            padding: 6px 8px;
-            border-radius: 6px;
-            font-size: 0.85rem;
+        input[type=range] {
+            width: 100%;
+            height: 4px;
+            border-radius: 2px;
+            background: #334155;
+            appearance: none;
+            -webkit-appearance: none;
             outline: none;
         }
 
-        .input-group input:focus {
-            border-color: #3b82f6;
+        input[type=range]::-webkit-slider-thumb {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #818cf8;
+            cursor: pointer;
         }
 
-        /* Modal für Kamera */
-        #camera-modal {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        #camera-video {
-            max-width: 90vw;
-            max-height: 70vh;
-            border-radius: 12px;
-            border: 2px solid rgba(255,255,255,0.2);
-        }
-
-        .camera-actions {
+        /* Color Picker Section */
+        .color-picker-row {
             display: flex;
+            align-items: center;
             gap: 10px;
         }
 
-        /* Scrollbar Design */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
+        input[type="color"] {
+            appearance: none;
+            -webkit-appearance: none;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            cursor: pointer;
             background: transparent;
         }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.2);
-            border-radius: 3px;
+
+        input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+
+        input[type="color"]::-webkit-color-swatch {
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+        }
+
+        /* Camera Modal Overlay */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(7, 10, 18, 0.9);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .modal.hidden {
+            display: none;
+        }
+
+        .modal-body {
+            background: #0f172a;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 500px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .video-container {
+            width: 100%;
+            height: 320px;
+            background: #000;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .modal-footer {
+            padding: 14px 16px;
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            background: rgba(15, 23, 42, 0.5);
+        }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(30, 41, 59, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #f8fafc;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            pointer-events: none;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 60;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* Mobile Responsive adjustments */
+        @media (max-width: 768px) {
+            header {
+                padding: 0 10px;
+            }
+            .logo span {
+                display: none;
+            }
+            .btn span:not(:first-child) {
+                display: none;
+            }
+            .btn {
+                padding: 7px 10px;
+            }
+            .panel {
+                top: auto;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                width: 100%;
+                max-width: 100%;
+                max-height: 75vh;
+                border-bottom-left-radius: 0;
+                border-bottom-right-radius: 0;
+                border-top-left-radius: 20px;
+                border-top-right-radius: 20px;
+                transform: translateY(100%);
+            }
+            .panel:not(.collapsed) {
+                transform: translateY(0);
+            }
+            .panel.collapsed {
+                transform: translateY(100%);
+            }
         }
     </style>
 </head>
 <body>
 
-    <div id="app-container">
-        <!-- Canvas Arbeitsbereich -->
-        <div id="canvas-wrapper" id="drop-area">
-            <canvas id="imageCanvas"></canvas>
+    <!-- Direct Hidden Input for Image Upload -->
+    <input type="file" id="fileInput" accept="image/*" style="display: none;">
+
+    <!-- Navigation Header -->
+    <header>
+        <div class="logo">
+            <div class="logo-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M12 2v20M2 12h20"/></svg>
+            </div>
+            <span>RGB Studio</span>
         </div>
 
-        <!-- Button zum Öffnen/Schließen des Panels -->
-        <button id="toggle-panel-btn">⚙️ Steuerung</button>
+        <div class="actions">
+            <!-- Trigger Buttons -->
+            <button class="btn" id="headerUploadBtn" title="Bild laden">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <span>Laden</span>
+            </button>
 
-        <!-- Einklappbares Bedienfeld -->
-        <div id="control-panel">
-            <div class="panel-header">
-                <h2>Farb- & Bildanalyse</h2>
-                <button class="close-btn" id="close-panel-btn">&times;</button>
+            <button class="btn" id="headerCameraBtn" title="Kamera">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                <span>Kamera</span>
+            </button>
+
+            <!-- Fullscreen Toggle Button -->
+            <button class="btn btn-icon" id="fullscreenBtn" title="Vollbild umschalten">
+                <svg id="fsIcon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+            </button>
+
+            <!-- Save Group with Format Selection Dropdown -->
+            <div class="save-group">
+                <button class="btn btn-primary" id="saveMenuBtn">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                    <span>Speichern</span>
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+                </button>
+                <div class="save-dropdown-menu" id="saveDropdown">
+                    <button class="save-dropdown-item" id="savePngBtn">
+                        <span>Als PNG speichern</span>
+                        <span style="font-size:0.7rem; color:#818cf8;">.png</span>
+                    </button>
+                    <button class="save-dropdown-item" id="saveJpgBtn">
+                        <span>Als JPG speichern</span>
+                        <span style="font-size:0.7rem; color:#818cf8;">.jpg</span>
+                    </button>
+                </div>
             </div>
 
-            <!-- Bildquelle -->
-            <div class="section-group">
-                <h3>Bildquelle</h3>
-                <div class="btn-grid" style="margin-bottom: 8px;">
-                    <button class="btn btn-secondary" id="btn-load-test">🎨 Testbild</button>
-                    <button class="btn btn-accent" id="btn-open-camera">📷 Kamera</button>
-                </div>
-                <div class="btn-grid">
-                    <button class="btn" id="btn-upload">📁 Datei laden</button>
-                    <button class="btn btn-success" id="btn-save">💾 Speichern</button>
-                </div>
-                <input type="file" id="file-input" accept="image/*" style="display: none;">
-            </div>
+            <button class="btn btn-icon" id="togglePanelBtn" title="Bedienfeld umschalten">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+            </button>
+        </div>
+    </header>
 
-            <!-- Bildgröße anpassen -->
-            <div class="section-group">
-                <h3>Bildgröße anpassen</h3>
-                <div class="resize-grid">
-                    <div class="input-group">
-                        <label>Modus</label>
-                        <select id="resize-mode">
-                            <option value="percent">Prozent (%)</option>
-                            <option value="pixel">Pixel (px)</option>
-                        </select>
-                    </div>
-                    <div class="input-group">
-                        <label id="width-label">Breite (%)</label>
-                        <input type="number" id="resize-width" value="100" min="1" max="10000">
-                    </div>
+    <!-- Workspace Viewport -->
+    <div class="workspace" id="workspace">
+        <canvas id="mainCanvas"></canvas>
+
+        <!-- Empty State Screen -->
+        <div class="empty-state" id="emptyState">
+            <div class="empty-card">
+                <h2>RGB Farb-Analysator</h2>
+                <p>Wähle eine Option, um mit der Farbkanal-Analyse, Farbisolation und Highlight-Erkennung zu starten.</p>
+                
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="emptyUploadBtn" style="justify-content: center; padding: 10px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        <span>Bild von Gerät auswählen</span>
+                    </button>
+
+                    <button class="btn" id="testImageBtn" style="justify-content: center; padding: 10px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a7 7 0 1 0 10 10"/></svg>
+                        <span>Testbild generieren</span>
+                    </button>
+
+                    <button class="btn" id="emptyCameraBtn" style="justify-content: center; padding: 10px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                        <span>Foto mit Kamera machen</span>
+                    </button>
                 </div>
-                <div class="resize-grid" id="height-container" style="display: none;">
-                    <div class="input-group">
-                        <label>Höhe (px)</label>
-                        <input type="number" id="resize-height" value="100" min="1" max="10000">
-                    </div>
-                    <div class="input-group" style="justify-content: flex-end;">
-                        <label style="display:flex; align-items:center; gap:5px; margin-top:14px; cursor:pointer; font-size:0.8rem;">
-                            <input type="checkbox" id="aspect-ratio-lock" checked> Seitenverhältnis
+            </div>
+        </div>
+    </div>
+
+    <!-- Control Sidebar Panel -->
+    <aside class="panel collapsed" id="panel">
+        <div class="panel-header">
+            <h3>Steuerung & Filter</h3>
+            <button class="btn btn-icon" id="closePanelBtn" style="border:none; background:transparent;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+
+        <div class="panel-content">
+            <!-- 0. Image Resizing & Scaling Card -->
+            <div class="card">
+                <div class="control-row">
+                    <span style="font-weight:600;">Bildgröße (Skalieren)</span>
+                    <div style="display:flex; align-items:center; gap:4px;">
+                        <span style="font-size:0.7rem; color:#94a3b8;">Seitenverhältnis</span>
+                        <label class="switch">
+                            <input type="checkbox" id="aspectRatioToggle" checked>
+                            <span class="slider-switch"></span>
                         </label>
                     </div>
                 </div>
-                <button class="btn btn-secondary" id="btn-apply-resize" style="width:100%; margin-top:6px;">Größe anwenden</button>
-            </div>
 
-            <!-- Speichertiefe & Format -->
-            <div class="section-group">
-                <h3>Export Format</h3>
-                <div class="resize-grid">
+                <div class="dim-inputs">
                     <div class="input-group">
-                        <label>Format</label>
-                        <select id="export-format">
-                            <option value="image/png">PNG</option>
-                            <option value="image/jpeg">JPG</option>
-                        </select>
+                        <label>Breite (px)</label>
+                        <input type="number" id="widthInput" min="10" max="8000" value="0">
                     </div>
-                    <div class="input-group" id="jpg-quality-group">
-                        <label>JPG Qualität (<span id="quality-val">90</span>%)</label>
-                        <input type="range" id="export-quality" min="10" max="100" value="90">
+                    <div class="input-group">
+                        <label>Höhe (px)</label>
+                        <input type="number" id="heightInput" min="10" max="8000" value="0">
                     </div>
                 </div>
+
+                <div class="range-wrap">
+                    <div class="range-header">
+                        <span>Skalierung in Prozent</span>
+                        <span id="scalePercentVal">100%</span>
+                    </div>
+                    <input type="range" id="scalePercentSlider" min="10" max="300" value="100">
+                </div>
+
+                <div class="scale-actions">
+                    <button class="btn btn-primary" id="applyResizeBtn" style="flex:1; justify-content:center; padding:6px;">
+                        <span>Größe anwenden</span>
+                    </button>
+                    <button class="btn" id="resetSizeBtn" title="Originalgröße">
+                        <span>Reset</span>
+                    </button>
+                </div>
             </div>
 
-            <!-- RGB Hauptschalter -->
-            <div class="section-group">
-                <h3>RGB Kanäle</h3>
-                <div class="toggle-row">
-                    <span>Rot-Kanal</span>
-                    <label class="switch"><input type="checkbox" id="toggle-r" checked><span class="slider"></span></label>
-                </div>
-                <div class="toggle-row">
-                    <span>Grün-Kanal</span>
-                    <label class="switch"><input type="checkbox" id="toggle-g" checked><span class="slider"></span></label>
-                </div>
-                <div class="toggle-row">
-                    <span>Blau-Kanal</span>
-                    <label class="switch" style="margin-top:4px;"><input type="checkbox" id="toggle-b" checked><span class="slider"></span></label>
+            <!-- 1. Preset Filters -->
+            <div>
+                <div class="section-title">Filter Presets</div>
+                <div class="presets-grid">
+                    <button class="preset-btn" data-preset="night"><span>Nacht</span><span>🌙</span></button>
+                    <button class="preset-btn" data-preset="fog"><span>Nebel</span><span>🌫️</span></button>
+                    <button class="preset-btn" data-preset="sepia"><span>Sepia</span><span>📜</span></button>
+                    <button class="preset-btn" data-preset="sunset"><span>Sonnenuntergang</span><span>🌅</span></button>
+                    <button class="preset-btn" data-preset="ice"><span>Eis</span><span>❄️</span></button>
+                    <button class="preset-btn" data-preset="negative"><span>Negativ</span><span>🔄</span></button>
+                    <button class="preset-btn" data-preset="bw"><span>Schwarzweiß</span><span>🏁</span></button>
+                    <button class="preset-btn" data-preset="pop"><span>Pop</span><span>🎨</span></button>
+                    <button class="preset-btn" data-preset="infrared"><span>Infrarot</span><span>🌸</span></button>
+                    <button class="preset-btn" data-preset="vintage"><span>Vintage</span><span>📷</span></button>
                 </div>
             </div>
 
-            <!-- Farbisolation & Pipette -->
-            <div class="section-group">
-                <h3>Farbisolation (Pipette)</h3>
-                <button class="btn btn-accent" id="btn-picker" style="width:100%; margin-bottom:8px;">🎯 Farbe mit Pipette wählen</button>
-                <div id="isolation-preview-box" style="display:none;">
-                    <div id="color-preview-sample"></div>
-                    <div style="font-size:0.85rem;" id="color-info-text">Keine Farbe ausgewählt</div>
+            <!-- 2. RGB Main Channels -->
+            <div>
+                <div class="section-title">Grundfarben (Ein/Aus)</div>
+                <div class="rgb-grid">
+                    <button class="rgb-btn red active" id="btnRed">
+                        <span>ROT</span>
+                    </button>
+                    <button class="rgb-btn green active" id="btnGreen">
+                        <span>GRÜN</span>
+                    </button>
+                    <button class="rgb-btn blue active" id="btnBlue">
+                        <span>BLAU</span>
+                    </button>
                 </div>
-                <button class="btn btn-secondary" id="btn-reset-isolation" style="width:100%; margin-top:8px; display:none;">Isolation zurücksetzen</button>
             </div>
 
-            <!-- Regler & Filter -->
-            <div class="section-group">
-                <h3>Anpassungs-Regler</h3>
-                
-                <div class="slider-control">
-                    <label><span>Farbtoleranz</span><span id="val-tolerance">35</span></label>
-                    <input type="range" id="range-tolerance" min="1" max="150" value="35">
+            <!-- 3. Highlight Mode -->
+            <div class="card">
+                <div class="control-row">
+                    <span style="font-weight:600;">Highlight-Modus</span>
+                    <label class="switch">
+                        <input type="checkbox" id="highlightToggle" checked>
+                        <span class="slider-switch"></span>
+                    </label>
+                </div>
+                <div class="range-wrap">
+                    <div class="range-header">
+                        <span>Inaktive Abdunkelung</span>
+                        <span id="dimVal">70%</span>
+                    </div>
+                    <input type="range" id="dimSlider" min="0" max="100" value="70">
+                </div>
+            </div>
+
+            <!-- 4. Specific Color Isolation (Pipette) -->
+            <div class="card">
+                <div class="control-row">
+                    <span style="font-weight:600;">Farbe Isolieren</span>
+                    <button class="btn" id="pipetteBtn" style="padding:4px 8px; font-size:0.75rem;">
+                        <span>Pipette</span>
+                    </button>
                 </div>
 
-                <div class="slider-control">
-                    <label><span>Inaktive Abdunkelung</span><span id="val-dim">80</span>%</label>
-                    <input type="range" id="range-dim" min="0" max="100" value="80">
+                <div class="color-picker-row">
+                    <input type="color" id="targetColor" value="#ef4444">
+                    <div style="flex:1;">
+                        <div id="targetHex" style="font-family:monospace; font-weight:bold; font-size:0.85rem;">#EF4444</div>
+                        <div style="font-size:0.7rem; color:#64748b;">Ziel-Farbton</div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="isolateToggle">
+                        <span class="slider-switch"></span>
+                    </label>
                 </div>
 
-                <div class="slider-control">
-                    <label><span>Helligkeit</span><span id="val-brightness">0</span></label>
-                    <input type="range" id="range-brightness" min="-100" max="100" value="0">
+                <div class="range-wrap">
+                    <div class="range-header">
+                        <span>Farbtoleranz</span>
+                        <span id="tolVal">30%</span>
+                    </div>
+                    <input type="range" id="tolSlider" min="1" max="100" value="30">
                 </div>
+            </div>
 
-                <div class="slider-control">
-                    <label><span>Kontrast</span><span id="val-contrast">0</span></label>
-                    <input type="range" id="range-contrast" min="-100" max="100" value="0">
+            <!-- 5. Extended Image Adjustments -->
+            <div class="card">
+                <div class="section-title" style="margin:0;">Anpassungen & Regler</div>
+                <div class="range-wrap">
+                    <div class="range-header">
+                        <span>Sättigung</span>
+                        <span id="satVal">0</span>
+                    </div>
+                    <input type="range" id="satSlider" min="-100" max="100" value="0">
                 </div>
+                <div class="range-wrap">
+                    <div class="range-header">
+                        <span>Helligkeit</span>
+                        <span id="brightVal">0</span>
+                    </div>
+                    <input type="range" id="brightSlider" min="-100" max="100" value="0">
+                </div>
+                <div class="range-wrap">
+                    <div class="range-header">
+                        <span>Kontrast</span>
+                        <span id="contrastVal">0</span>
+                    </div>
+                    <input type="range" id="contrastSlider" min="-100" max="100" value="0">
+                </div>
+            </div>
 
-                <div class="slider-control">
-                    <label><span>Sättigung</span><span id="val-saturation">0</span></label>
-                    <input type="range" id="range-saturation" min="-100" max="100" value="0">
-                </div>
+            <button class="btn" id="resetFiltersBtn" style="justify-content:center; width:100%;">
+                <span>Filter zurücksetzen</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Camera Modal Overlay -->
+    <div class="modal hidden" id="cameraModal">
+        <div class="modal-body">
+            <div class="modal-header">
+                <span style="font-weight:600; font-size:0.9rem;">Foto aufnehmen</span>
+                <button class="btn btn-icon" id="closeCameraModal" style="border:none; background:transparent;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div class="video-container">
+                <video id="webcam" autoplay playsinline></video>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" id="switchCameraBtn">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0-4.418-3.582-8-8-8s-8 3.582-8 8z"/><path d="M4 14c0 4.418 3.582 8 8 8s8-3.582 8-8"/></svg>
+                    <span>Kamera wechseln</span>
+                </button>
+                <button class="btn btn-primary" id="captureBtn">
+                    <span>Foto Knipsen</span>
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- Kamera Modal -->
-    <div id="camera-modal">
-        <video id="camera-video" autoplay playsinline></video>
-        <div class="camera-actions">
-            <button class="btn btn-success" id="btn-capture-photo">📸 Foto aufnehmen</button>
-            <button class="btn btn-danger" id="btn-close-camera">Abbrechen</button>
-        </div>
-    </div>
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">Nachricht</div>
 
     <script>
-        const canvas = document.getElementById('imageCanvas');
+        // --- Global Application State ---
+        const state = {
+            image: null,
+            originalCanvas: null, 
+            originalCtx: null,
+            activePreset: null,
+            channels: { r: true, g: true, b: true },
+            highlightMode: true,
+            dimFactor: 0.7,
+            isolateColor: false,
+            targetRGB: { r: 239, g: 68, b: 68 },
+            tolerance: 0.3,
+            saturation: 0,
+            brightness: 0,
+            contrast: 0,
+            pipetteActive: false,
+            scale: 1,
+            panX: 0,
+            panY: 0,
+            isDragging: false,
+            dragStart: { x: 0, y: 0 },
+            cameraStream: null,
+            facingMode: 'environment',
+            // Touch tracking for pinch-to-zoom
+            touchStartDist: 0,
+            initialScale: 1
+        };
+
+        // --- DOM Elements ---
+        const canvas = document.getElementById('mainCanvas');
         const ctx = canvas.getContext('2d', { willReadFrequently: true });
-        const wrapper = document.getElementById('canvas-wrapper');
-        
-        let originalImage = null;
-        let sourceImageWidth = 0;
-        let sourceImageHeight = 0;
+        const workspace = document.getElementById('workspace');
+        const emptyState = document.getElementById('emptyState');
+        const fileInput = document.getElementById('fileInput');
+        const panel = document.getElementById('panel');
+        const toast = document.getElementById('toast');
 
-        // Zoom & Pan Variablen
-        let scale = 1;
-        let panX = 0;
-        let panY = 0;
-        let isDragging = false;
-        let startX, startY;
+        // Camera DOM
+        const cameraModal = document.getElementById('cameraModal');
+        const webcam = document.getElementById('webcam');
 
-        // Farb-Pipette & Isolations-Variablen
-        let pickerActive = false;
-        let targetColor = null; // {r, g, b}
+        // Save Dropdown DOM
+        const saveMenuBtn = document.getElementById('saveMenuBtn');
+        const saveDropdown = document.getElementById('saveDropdown');
+        const savePngBtn = document.getElementById('savePngBtn');
+        const saveJpgBtn = document.getElementById('saveJpgBtn');
 
-        // Kamera Stream
-        let mediaStream = null;
+        // Fullscreen Toggle DOM
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        const fsIcon = document.getElementById('fsIcon');
 
-        // --- Panel Toggle ---
-        const panel = document.getElementById('control-panel');
-        document.getElementById('toggle-panel-btn').addEventListener('click', () => panel.classList.toggle('collapsed'));
-        document.getElementById('close-panel-btn').addEventListener('click', () => panel.classList.add('collapsed'));
-
-        // --- Testbild Generator ---
-        function loadTestImage() {
-            const w = 800, h = 600;
-            const offCanvas = document.createElement('canvas');
-            offCanvas.width = w;
-            offCanvas.height = h;
-            const oCtx = offCanvas.getContext('2d');
-
-            // Hintergrund-Farbverlauf & Muster
-            const grad = oCtx.createLinearGradient(0, 0, w, h);
-            grad.addColorStop(0, '#ff3366');
-            grad.addColorStop(0.5, '#33ccff');
-            grad.addColorStop(1, '#ffcc00');
-            oCtx.fillStyle = grad;
-            oCtx.fillRect(0, 0, w, h);
-
-            // Kreise und Formen in den Primär-/Sekundärfarben
-            oCtx.fillStyle = 'rgba(255, 0, 0, 0.8)';
-            oCtx.beginPath(); oCtx.arc(200, 200, 120, 0, Math.PI * 2); oCtx.fill();
-
-            oCtx.fillStyle = 'rgba(0, 255, 0, 0.8)';
-            oCtx.beginPath(); oCtx.arc(400, 250, 120, 0, Math.PI * 2); oCtx.fill();
-
-            oCtx.fillStyle = 'rgba(0, 0, 255, 0.8)';
-            oCtx.beginPath(); oCtx.arc(300, 380, 120, 0, Math.PI * 2); oCtx.fill();
-
-            oCtx.fillStyle = '#ffffff';
-            oCtx.font = 'bold 36px sans-serif';
-            oCtx.textAlign = 'center';
-            oCtx.fillText('RGB & Farbanalyse Testbild', w / 2, 80);
-
-            const img = new Image();
-            img.onload = () => {
-                originalImage = img;
-                sourceImageWidth = img.width;
-                sourceImageHeight = img.height;
-                resetViewAndProcess();
-            };
-            img.src = offCanvas.toDataURL();
-        }
-
-        function resetViewAndProcess() {
-            if (!originalImage) return;
-            scale = Math.min((wrapper.clientWidth * 0.85) / originalImage.width, (wrapper.clientHeight * 0.85) / originalImage.height);
-            if (scale > 1) scale = 1;
-            panX = (wrapper.clientWidth - originalImage.width * scale) / 2;
-            panY = (wrapper.clientHeight - originalImage.height * scale) / 2;
-            processImage();
-        }
-
-        // --- Bildverarbeitung & Hauptrender-Loop ---
-        function processImage() {
-            if (!originalImage) return;
-
-            canvas.width = sourceImageWidth;
-            canvas.height = sourceImageHeight;
-
-            // 1. Originales Bild zeichnen
-            ctx.drawImage(originalImage, 0, 0, sourceImageWidth, sourceImageHeight);
-
-            // 2. Pixeldaten holen
-            const imgData = ctx.getImageData(0, 0, sourceImageWidth, sourceImageHeight);
-            const data = imgData.data;
-
-            // Einstellungen auslesen
-            const useR = document.getElementById('toggle-r').checked;
-            const useG = document.getElementById('toggle-g').checked;
-            const useB = document.getElementById('toggle-b').checked;
-
-            const tolerance = parseInt(document.getElementById('range-tolerance').value);
-            const dimFactor = (100 - parseInt(document.getElementById('range-dim').value)) / 100;
-            const brightness = parseInt(document.getElementById('range-brightness').value);
-            const contrast = parseInt(document.getElementById('range-contrast').value);
-            const saturation = parseInt(document.getElementById('range-saturation').value) / 100;
-
-            const factor = contrast === 0 ? 1 : (259 * (contrast + 255)) / (255 * (259 - contrast));
-
-            for (let i = 0; i < data.length; i += 4) {
-                let r = data[i];
-                let g = data[i + 1];
-                let b = data[i + 2];
-
-                // Kanal-Schalter anwenden (nicht aktive Kanäle auf 0 setzen)
-                let cr = useR ? r : 0;
-                let cg = useG ? g : 0;
-                let cb = useB ? b : 0;
-
-                let isHighlighted = true;
-
-                // Farbisolation via Pipette prüfen
-                if (targetColor) {
-                    const dist = Math.sqrt(
-                        Math.pow(cr - targetColor.r, 2) +
-                        Math.pow(cg - targetColor.g, 2) +
-                        Math.pow(cb - targetColor.b, 2)
-                    );
-                    if (dist > tolerance) {
-                        isHighlighted = false;
-                    }
+        fullscreenBtn.onclick = () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    showToast('Vollbildmodus nicht unterstützt');
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
                 }
-
-                // Helligkeit, Kontrast, Sättigung anwenden
-                // Helligkeit
-                cr += brightness; cg += brightness; cb += brightness;
-
-                // Kontrast
-                if (contrast !== 0) {
-                    cr = factor * (cr - 128) + 128;
-                    cg = factor * (cg - 128) + 128;
-                    cb = factor * (cb - 128) + 128;
-                }
-
-                // Sättigung
-                if (saturation !== 0) {
-                    const gray = 0.299 * cr + 0.587 * cg + 0.114 * cb;
-                    cr = gray + (cr - gray) * (1 + saturation);
-                    cg = gray + (cg - gray) * (1 + saturation);
-                    cb = gray + (cb - gray) * (1 + saturation);
-                }
-
-                // Begrenzung 0-255
-                cr = Math.max(0, Math.min(255, cr));
-                cg = Math.max(0, Math.min(255, cg));
-                cb = Math.max(0, Math.min(255, cb));
-
-                // Wenn nicht im Highlight / nicht aktiv -> in Graustufen umwandeln und abdunkeln
-                if (!isHighlighted) {
-                    const grayVal = 0.299 * cr + 0.587 * cg + 0.114 * cb;
-                    cr = grayVal * dimFactor;
-                    cg = grayVal * dimFactor;
-                    cb = grayVal * dimFactor;
-                }
-
-                data[i]     = cr;
-                data[i + 1] = cg;
-                data[i + 2] = cb;
             }
+        };
 
-            ctx.putImageData(imgData, 0, 0);
-            drawCanvasTransform();
-        }
-
-        function drawCanvasTransform() {
-            canvas.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
-        }
-
-        // --- Event Listeners für Filter & Schalter ---
-        const controlsToWatch = ['toggle-r', 'toggle-g', 'toggle-b', 'range-tolerance', 'range-dim', 'range-brightness', 'range-contrast', 'range-saturation'];
-        controlsToWatch.forEach(id => {
-            document.getElementById(id).addEventListener('input', (e) => {
-                // UI Label Update
-                if (id === 'range-tolerance') document.getElementById('val-tolerance').innerText = e.target.value;
-                if (id === 'range-dim') document.getElementById('val-dim').innerText = e.target.value;
-                if (id === 'range-brightness') document.getElementById('val-brightness').innerText = e.target.value;
-                if (id === 'range-contrast') document.getElementById('val-contrast').innerText = e.target.value;
-                if (id === 'range-saturation') document.getElementById('val-saturation').innerText = e.target.value;
-                
-                processImage();
-            });
+        document.addEventListener('fullscreenchange', () => {
+            if (document.fullscreenElement) {
+                fsIcon.innerHTML = '<path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/>';
+            } else {
+                fsIcon.innerHTML = '<path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>';
+            }
         });
 
-        // --- Bild Upload ---
-        document.getElementById('btn-upload').addEventListener('click', () => document.getElementById('file-input').click());
-        document.getElementById('file-input').addEventListener('change', (e) => {
+        // --- Toast Function ---
+        function showToast(msg) {
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+
+        // --- Save Menu Toggle ---
+        saveMenuBtn.onclick = (e) => {
+            e.stopPropagation();
+            saveDropdown.classList.toggle('show');
+        };
+
+        document.addEventListener('click', (e) => {
+            if (!saveDropdown.contains(e.target) && e.target !== saveMenuBtn) {
+                saveDropdown.classList.remove('show');
+            }
+        });
+
+        // --- File Upload Processing ---
+        function triggerFileUpload() {
+            fileInput.value = '';
+            fileInput.click();
+        }
+
+        document.getElementById('headerUploadBtn').onclick = triggerFileUpload;
+        document.getElementById('emptyUploadBtn').onclick = triggerFileUpload;
+
+        fileInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
+
             const reader = new FileReader();
-            reader.onload = (event) => {
+            reader.onload = (evt) => {
                 const img = new Image();
                 img.onload = () => {
-                    originalImage = img;
-                    sourceImageWidth = img.width;
-                    sourceImageHeight = img.height;
-                    targetColor = null;
-                    document.getElementById('isolation-preview-box').style.display = 'none';
-                    document.getElementById('btn-reset-isolation').style.display = 'none';
-                    resetViewAndProcess();
+                    loadImage(img);
+                    showToast('Bild erfolgreich geladen');
                 };
-                img.src = event.target.result;
+                img.src = evt.target.result;
             };
             reader.readAsDataURL(file);
         });
 
-        document.getElementById('btn-load-test').addEventListener('click', () => {
-            targetColor = null;
-            document.getElementById('isolation-preview-box').style.display = 'none';
-            document.getElementById('btn-reset-isolation').style.display = 'none';
-            loadTestImage();
-        });
+        // --- Procedural Test Pattern Generator ---
+        function generateTestImage() {
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = 1000;
+            tempCanvas.height = 700;
+            const tCtx = tempCanvas.getContext('2d');
 
-        // --- Kamera Integration ---
-        const cameraModal = document.getElementById('camera-modal');
-        const cameraVideo = document.getElementById('camera-video');
+            tCtx.fillStyle = '#0f172a';
+            tCtx.fillRect(0, 0, 1000, 700);
 
-        document.getElementById('btn-open-camera').addEventListener('click', async () => {
-            try {
-                mediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-                cameraVideo.srcObject = mediaStream;
-                cameraModal.style.display = 'flex';
-            } catch (err) {
-                alert('Kamera konnte nicht geöffnet werden: ' + err.message);
-            }
-        });
+            tCtx.globalCompositeOperation = 'screen';
+            
+            tCtx.fillStyle = '#ff0000';
+            tCtx.beginPath();
+            tCtx.arc(420, 300, 160, 0, Math.PI * 2);
+            tCtx.fill();
 
-        document.getElementById('btn-close-camera').addEventListener('click', stopCamera);
+            tCtx.fillStyle = '#00ff00';
+            tCtx.beginPath();
+            tCtx.arc(580, 300, 160, 0, Math.PI * 2);
+            tCtx.fill();
 
-        function stopCamera() {
-            if (mediaStream) {
-                mediaStream.getTracks().forEach(track => track.stop());
-                mediaStream = null;
-            }
-            cameraModal.style.display = 'none';
-        }
+            tCtx.fillStyle = '#0000ff';
+            tCtx.beginPath();
+            tCtx.arc(500, 440, 160, 0, Math.PI * 2);
+            tCtx.fill();
 
-        document.getElementById('btn-capture-photo').addEventListener('click', () => {
-            const vCanvas = document.createElement('canvas');
-            vCanvas.width = cameraVideo.videoWidth || 1280;
-            vCanvas.height = cameraVideo.videoHeight || 720;
-            const vCtx = vCanvas.getContext('2d');
-            vCtx.drawImage(cameraVideo, 0, 0, vCanvas.width, vCanvas.height);
+            tCtx.globalCompositeOperation = 'source-over';
+
+            const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#00ffff', '#ff00ff', '#ffffff'];
+            colors.forEach((col, i) => {
+                tCtx.fillStyle = col;
+                tCtx.fillRect(60 + i * 125, 60, 100, 100);
+            });
+
+            const grad = tCtx.createLinearGradient(60, 0, 935, 0);
+            grad.addColorStop(0, 'red');
+            grad.addColorStop(0.17, 'yellow');
+            grad.addColorStop(0.33, 'lime');
+            grad.addColorStop(0.5, 'cyan');
+            grad.addColorStop(0.67, 'blue');
+            grad.addColorStop(0.83, 'magenta');
+            grad.addColorStop(1, 'red');
+
+            tCtx.fillStyle = grad;
+            tCtx.fillRect(60, 600, 885, 40);
 
             const img = new Image();
             img.onload = () => {
-                originalImage = img;
-                sourceImageWidth = img.width;
-                sourceImageHeight = img.height;
-                targetColor = null;
-                document.getElementById('isolation-preview-box').style.display = 'none';
-                document.getElementById('btn-reset-isolation').style.display = 'none';
-                stopCamera();
-                resetViewAndProcess();
+                loadImage(img);
+                showToast('Testbild generiert');
             };
-            img.src = vCanvas.toDataURL();
-        });
+            img.src = tempCanvas.toDataURL();
+        }
 
-        // --- Bildgrößen-Anpassung ---
-        const resizeModeSelect = document.getElementById('resize-mode');
-        const widthLabel = document.getElementById('width-label');
-        const heightContainer = document.getElementById('height-container');
-        const resizeWidthInput = document.getElementById('resize-width');
-        const resizeHeightInput = document.getElementById('resize-height');
+        document.getElementById('testImageBtn').onclick = generateTestImage;
 
-        resizeModeSelect.addEventListener('change', () => {
-            if (resizeModeSelect.value === 'percent') {
-                widthLabel.innerText = 'Breite (%)';
-                heightContainer.style.display = 'none';
-                resizeWidthInput.value = '100';
+        // --- Camera Capture Logic ---
+        async function startCamera() {
+            cameraModal.classList.remove('hidden');
+            if (state.cameraStream) stopCamera();
+
+            try {
+                state.cameraStream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: state.facingMode, width: { ideal: 1920 }, height: { ideal: 1080 } }
+                });
+                webcam.srcObject = state.cameraStream;
+            } catch (err) {
+                showToast('Kamera konnte nicht gestartet werden');
+                cameraModal.classList.add('hidden');
+            }
+        }
+
+        function stopCamera() {
+            if (state.cameraStream) {
+                state.cameraStream.getTracks().forEach(track => track.stop());
+                state.cameraStream = null;
+            }
+        }
+
+        document.getElementById('headerCameraBtn').onclick = startCamera;
+        document.getElementById('emptyCameraBtn').onclick = startCamera;
+        document.getElementById('closeCameraModal').onclick = () => {
+            stopCamera();
+            cameraModal.classList.add('hidden');
+        };
+
+        document.getElementById('switchCameraBtn').onclick = () => {
+            state.facingMode = state.facingMode === 'user' ? 'environment' : 'user';
+            startCamera();
+        };
+
+        document.getElementById('captureBtn').onclick = () => {
+            if (!webcam.videoWidth) return;
+
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = webcam.videoWidth;
+            tempCanvas.height = webcam.videoHeight;
+            const tCtx = tempCanvas.getContext('2d');
+            tCtx.drawImage(webcam, 0, 0);
+
+            const img = new Image();
+            img.onload = () => {
+                loadImage(img);
+                stopCamera();
+                cameraModal.classList.add('hidden');
+                showToast('Foto aufgenommen');
+            };
+            img.src = tempCanvas.toDataURL('image/png');
+        };
+
+        // --- Load Image & Store Clean Offscreen Reference ---
+        function loadImage(img) {
+            state.image = img;
+
+            // Setup Offscreen Raw Image Buffer
+            state.originalCanvas = document.createElement('canvas');
+            state.originalCanvas.width = img.width;
+            state.originalCanvas.height = img.height;
+            state.originalCtx = state.originalCanvas.getContext('2d', { willReadFrequently: true });
+            state.originalCtx.drawImage(img, 0, 0);
+
+            // Update Resize inputs
+            document.getElementById('widthInput').value = img.width;
+            document.getElementById('heightInput').value = img.height;
+            document.getElementById('scalePercentSlider').value = 100;
+            document.getElementById('scalePercentVal').textContent = '100%';
+
+            emptyState.style.display = 'none';
+            resetZoom();
+            render();
+        }
+
+        // --- Image Resizing Logic ---
+        const widthInput = document.getElementById('widthInput');
+        const heightInput = document.getElementById('heightInput');
+        const scalePercentSlider = document.getElementById('scalePercentSlider');
+        const scalePercentVal = document.getElementById('scalePercentVal');
+        const aspectRatioToggle = document.getElementById('aspectRatioToggle');
+
+        let originalImageWidth = 0;
+        let originalImageHeight = 0;
+
+        // When a new image loads, store original dimensions for scaling calculations
+        const originalLoadImage = loadImage;
+        loadImage = function(img) {
+            originalImageWidth = img.width;
+            originalImageHeight = img.height;
+            originalLoadImage(img);
+        };
+
+        widthInput.oninput = () => {
+            if (!state.image || !aspectRatioToggle.checked) return;
+            const w = parseInt(widthInput.value) || 0;
+            if (w > 0) {
+                const ratio = originalImageHeight / originalImageWidth;
+                heightInput.value = Math.round(w * ratio);
+            }
+        };
+
+        heightInput.oninput = () => {
+            if (!state.image || !aspectRatioToggle.checked) return;
+            const h = parseInt(heightInput.value) || 0;
+            if (h > 0) {
+                const ratio = originalImageWidth / originalImageHeight;
+                widthInput.value = Math.round(h * ratio);
+            }
+        };
+
+        scalePercentSlider.oninput = (e) => {
+            const pct = parseInt(e.target.value);
+            scalePercentVal.textContent = `${pct}%`;
+            if (originalImageWidth > 0 && originalImageHeight > 0) {
+                widthInput.value = Math.round(originalImageWidth * (pct / 100));
+                heightInput.value = Math.round(originalImageHeight * (pct / 100));
+            }
+        };
+
+        document.getElementById('resetSizeBtn').onclick = () => {
+            if (originalImageWidth > 0) {
+                widthInput.value = originalImageWidth;
+                heightInput.value = originalImageHeight;
+                scalePercentSlider.value = 100;
+                scalePercentVal.textContent = '100%';
+                applyResize(originalImageWidth, originalImageHeight);
+                showToast('Auf Originalgröße zurückgesetzt');
+            }
+        };
+
+        document.getElementById('applyResizeBtn').onclick = () => {
+            const targetW = parseInt(widthInput.value);
+            const targetH = parseInt(heightInput.value);
+            if (!targetW || !targetH || targetW <= 0 || targetH <= 0) {
+                showToast('Bitte gültige Pixelmaße eingeben');
+                return;
+            }
+            applyResize(targetW, targetH);
+            showToast(`Bildgröße geändert auf ${targetW} × ${targetH} px`);
+        };
+
+        function applyResize(newW, newH) {
+            if (!state.image) return;
+
+            // Draw current original image onto a temporary resized canvas
+            const resizeCanvas = document.createElement('canvas');
+            resizeCanvas.width = newW;
+            resizeCanvas.height = newH;
+            const rCtx = resizeCanvas.getContext('2d', { willReadFrequently: true });
+            
+            // High-quality image smoothing
+            rCtx.imageSmoothingEnabled = true;
+            rCtx.imageSmoothingQuality = 'high';
+            rCtx.drawImage(state.originalCanvas, 0, 0, newW, newH);
+
+            // Replace original buffer reference
+            state.originalCanvas = resizeCanvas;
+            state.originalCtx = rCtx;
+
+            const newImg = new Image();
+            newImg.onload = () => {
+                state.image = newImg;
+                render();
+            };
+            newImg.src = resizeCanvas.toDataURL();
+        }
+
+        function resetZoom() {
+            if (!state.image) return;
+            const wsWidth = workspace.clientWidth;
+            const wsHeight = workspace.clientHeight - 56;
+            
+            const scaleX = (wsWidth - 60) / state.image.width;
+            const scaleY = (wsHeight - 60) / state.image.height;
+            
+            state.scale = Math.min(scaleX, scaleY, 1);
+            state.panX = 0;
+            state.panY = 0;
+            updateTransform();
+        }
+
+        function updateTransform() {
+            canvas.style.transform = `translate(${state.panX}px, ${state.panY}px) scale(${state.scale})`;
+        }
+
+        // --- Helper: Convert RGB to HSV ---
+        function rgbToHsv(r, g, b) {
+            r /= 255; g /= 255; b /= 255;
+            let max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h, s, v = max;
+            let d = max - min;
+            s = max === 0 ? 0 : d / max;
+
+            if (max === min) {
+                h = 0;
             } else {
-                widthLabel.innerText = 'Breite (px)';
-                heightContainer.style.display = 'grid';
-                if (originalImage) {
-                    resizeWidthInput.value = sourceImageWidth;
-                    resizeHeightInput.value = sourceImageHeight;
+                switch (max) {
+                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                    case g: h = (b - r) / d + 2; break;
+                    case b: h = (r - g) / d + 4; break;
                 }
+                h /= 6;
             }
+            return [h, s, v];
+        }
+
+        // --- Pixel-Level Render Engine ---
+        function render() {
+            if (!state.image) return;
+
+            canvas.width = state.image.width;
+            canvas.height = state.image.height;
+            
+            const srcImgData = state.originalCtx.getImageData(0, 0, canvas.width, canvas.height);
+            const srcData = srcImgData.data;
+
+            const outImgData = ctx.createImageData(canvas.width, canvas.height);
+            const outData = outImgData.data;
+
+            const { r: rOn, g: gOn, b: bOn } = state.channels;
+            const contrastFactor = (259 * (state.contrast + 255)) / (255 * (259 - state.contrast));
+            const satFactor = (state.saturation + 100) / 100;
+            const dimMultiplier = 1 - state.dimFactor;
+
+            const targetR = state.targetRGB.r;
+            const targetG = state.targetRGB.g;
+            const targetB = state.targetRGB.b;
+
+            const maxDist = 441.67;
+            const distThreshold = state.tolerance * maxDist;
+
+            for (let i = 0; i < srcData.length; i += 4) {
+                let origR = srcData[i];
+                let origG = srcData[i + 1];
+                let origB = srcData[i + 2];
+                let alpha = srcData[i + 3];
+
+                let r = origR + state.brightness;
+                let g = origG + state.brightness;
+                let b = origB + state.brightness;
+
+                r = contrastFactor * (r - 128) + 128;
+                g = contrastFactor * (g - 128) + 128;
+                b = contrastFactor * (b - 128) + 128;
+
+                if (state.saturation !== 0) {
+                    const grayVal = 0.299 * r + 0.587 * g + 0.114 * b;
+                    r = grayVal + (r - grayVal) * satFactor;
+                    g = grayVal + (g - grayVal) * satFactor;
+                    b = grayVal + (b - grayVal) * satFactor;
+                }
+
+                if (state.activePreset) {
+                    let pr = r, pg = g, pb = b;
+                    const gray = 0.299 * r + 0.587 * g + 0.114 * b;
+
+                    switch (state.activePreset) {
+                        case 'night':
+                            r = gray * 0.1;
+                            g = gray * 1.2 + 20;
+                            b = gray * 0.4 + 10;
+                            break;
+                        case 'fog':
+                            r = gray * 0.6 + 60;
+                            g = gray * 0.65 + 65;
+                            b = gray * 0.7 + 75;
+                            break;
+                        case 'sepia':
+                            r = (pr * 0.393) + (pg * 0.769) + (pb * 0.189);
+                            g = (pr * 0.349) + (pg * 0.686) + (pb * 0.168);
+                            b = (pr * 0.272) + (pg * 0.534) + (pb * 0.131);
+                            break;
+                        case 'sunset':
+                            r = pr * 1.25 + 25;
+                            g = pg * 0.85;
+                            b = pb * 0.5;
+                            break;
+                        case 'ice':
+                            r = pr * 0.6;
+                            g = pg * 0.9 + 20;
+                            b = pb * 1.3 + 40;
+                            break;
+                        case 'negative':
+                            r = 255 - pr;
+                            g = 255 - pg;
+                            b = 255 - pb;
+                            break;
+                        case 'bw':
+                            r = gray; g = gray; b = gray;
+                            break;
+                        case 'pop':
+                            r = pr > 128 ? Math.min(255, pr * 1.3) : pr * 0.7;
+                            g = pg > 128 ? Math.min(255, pg * 1.3) : pg * 0.7;
+                            b = pb > 128 ? Math.min(255, pb * 1.3) : pb * 0.7;
+                            break;
+                        case 'infrared':
+                            r = (255 - pr) * 0.8 + pg * 0.5;
+                            g = pg * 0.3;
+                            b = (255 - pr) * 0.5 + pb * 0.2;
+                            break;
+                        case 'vintage':
+                            r = pr * 0.9 + 30;
+                            g = pg * 0.85 + 15;
+                            b = pb * 0.7 + 30;
+                            break;
+                    }
+                }
+
+                r = Math.min(255, Math.max(0, r));
+                g = Math.min(255, Math.max(0, g));
+                b = Math.min(255, Math.max(0, b));
+
+                let isMatch = true;
+
+                if (state.isolateColor) {
+                    const rgbDist = Math.sqrt(
+                        Math.pow(r - targetR, 2) +
+                        Math.pow(g - targetG, 2) +
+                        Math.pow(b - targetB, 2)
+                    );
+                    if (rgbDist > distThreshold) isMatch = false;
+                } else {
+                    const activeCount = (rOn ? 1 : 0) + (gOn ? 1 : 0) + (bOn ? 1 : 0);
+                    if (activeCount < 3) {
+                        if (!rOn && r >= g && r >= b) isMatch = false;
+                        if (!gOn && g >= r && g >= b) isMatch = false;
+                        if (!bOn && b >= r && b >= g) isMatch = false;
+                    }
+                }
+
+                if (isMatch) {
+                    outData[i] = rOn ? r : 0;
+                    outData[i + 1] = gOn ? g : 0;
+                    outData[i + 2] = bOn ? b : 0;
+                } else {
+                    if (state.highlightMode) {
+                        const gray = 0.299 * r + 0.587 * g + 0.114 * b;
+                        outData[i] = gray * dimMultiplier;
+                        outData[i + 1] = gray * dimMultiplier;
+                        outData[i + 2] = gray * dimMultiplier;
+                    } else {
+                        outData[i] = 0;
+                        outData[i + 1] = 0;
+                        outData[i + 2] = 0;
+                    }
+                }
+                outData[i + 3] = alpha;
+            }
+
+            ctx.putImageData(outImgData, 0, 0);
+        }
+
+        // --- Event Control Bindings ---
+        document.querySelectorAll('.preset-btn').forEach(btn => {
+            btn.onclick = () => {
+                const preset = btn.getAttribute('data-preset');
+                if (state.activePreset === preset) {
+                    state.activePreset = null;
+                    btn.classList.remove('active');
+                    showToast('Preset deaktiviert');
+                } else {
+                    document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+                    state.activePreset = preset;
+                    btn.classList.add('active');
+                    showToast(`Preset "${btn.querySelector('span').textContent}" angewendet`);
+                }
+                render();
+            };
         });
 
-        resizeWidthInput.addEventListener('input', () => {
-            if (resizeModeSelect.value === 'pixel' && document.getElementById('aspect-ratio-lock').checked && originalImage) {
-                const ratio = originalImage.height / originalImage.originalWidth || (sourceImageHeight / sourceImageWidth);
-                resizeHeightInput.value = Math.round(resizeWidthInput.value * ratio);
-            }
+        ['Red', 'Green', 'Blue'].forEach(col => {
+            const btn = document.getElementById(`btn${col}`);
+            const key = col.toLowerCase()[0];
+            btn.onclick = () => {
+                state.channels[key] = !state.channels[key];
+                btn.classList.toggle('active', state.channels[key]);
+                render();
+            };
         });
 
-        document.getElementById('btn-apply-resize').addEventListener('click', () => {
-            if (!originalImage) return;
-            let newW, newH;
+        document.getElementById('highlightToggle').onchange = (e) => {
+            state.highlightMode = e.target.checked;
+            render();
+        };
 
-            if (resizeModeSelect.value === 'percent') {
-                const pct = parseFloat(resizeWidthInput.value) / 100;
-                newW = Math.round(originalImage.width * pct);
-                newH = Math.round(originalImage.height * pct);
-            } else {
-                newW = parseInt(resizeWidthInput.value);
-                newH = parseInt(resizeHeightInput.value);
+        document.getElementById('dimSlider').oninput = (e) => {
+            state.dimFactor = e.target.value / 100;
+            document.getElementById('dimVal').textContent = `${e.target.value}%`;
+            render();
+        };
+
+        document.getElementById('isolateToggle').onchange = (e) => {
+            state.isolateColor = e.target.checked;
+            render();
+        };
+
+        document.getElementById('targetColor').oninput = (e) => {
+            const hex = e.target.value;
+            document.getElementById('targetHex').textContent = hex.toUpperCase();
+            state.targetRGB = {
+                r: parseInt(hex.slice(1, 3), 16),
+                g: parseInt(hex.slice(3, 5), 16),
+                b: parseInt(hex.slice(5, 7), 16)
+            };
+            if (state.isolateColor) render();
+        };
+
+        document.getElementById('tolSlider').oninput = (e) => {
+            state.tolerance = e.target.value / 100;
+            document.getElementById('tolVal').textContent = `${e.target.value}%`;
+            if (state.isolateColor) render();
+        };
+
+        // Pipette Tool
+        const pipetteBtn = document.getElementById('pipetteBtn');
+        pipetteBtn.onclick = () => {
+            if (!state.image) {
+                showToast('Bitte zuerst ein Bild laden');
+                return;
             }
+            state.pipetteActive = !state.pipetteActive;
+            pipetteBtn.style.background = state.pipetteActive ? '#4f46e5' : '';
+            workspace.style.cursor = state.pipetteActive ? 'crosshair' : 'grab';
+            if (state.pipetteActive) showToast('Klicke auf eine Farbe im Bild');
+        };
 
-            if (newW < 10 || newH < 10) {
-                alert('Größe ist zu klein.');
+        canvas.onclick = (e) => {
+            if (!state.pipetteActive || !state.image) return;
+
+            const rect = canvas.getBoundingClientRect();
+            const x = Math.floor((e.clientX - rect.left) * (canvas.width / rect.width));
+            const y = Math.floor((e.clientY - rect.top) * (canvas.height / rect.height));
+
+            const pixel = state.originalCtx.getImageData(x, y, 1, 1).data;
+            const hex = '#' + ((1 << 24) + (pixel[0] << 16) + (pixel[1] << 8) + pixel[2]).toString(16).slice(1).toUpperCase();
+            
+            document.getElementById('targetColor').value = hex;
+            document.getElementById('targetHex').textContent = hex;
+            state.targetRGB = { r: pixel[0], g: pixel[1], b: pixel[2] };
+            
+            state.isolateColor = true;
+            document.getElementById('isolateToggle').checked = true;
+
+            state.pipetteActive = false;
+            pipetteBtn.style.background = '';
+            workspace.style.cursor = 'grab';
+
+            render();
+            showToast(`Farbe ${hex} ausgewählt`);
+        };
+
+        document.getElementById('satSlider').oninput = (e) => {
+            state.saturation = parseInt(e.target.value);
+            document.getElementById('satVal').textContent = e.target.value;
+            render();
+        };
+
+        document.getElementById('brightSlider').oninput = (e) => {
+            state.brightness = parseInt(e.target.value);
+            document.getElementById('brightVal').textContent = e.target.value;
+            render();
+        };
+
+        document.getElementById('contrastSlider').oninput = (e) => {
+            state.contrast = parseInt(e.target.value);
+            document.getElementById('contrastVal').textContent = e.target.value;
+            render();
+        };
+
+        document.getElementById('resetFiltersBtn').onclick = () => {
+            state.activePreset = null;
+            state.channels = { r: true, g: true, b: true };
+            state.highlightMode = true;
+            state.isolateColor = false;
+            state.saturation = 0;
+            state.brightness = 0;
+            state.contrast = 0;
+            state.dimFactor = 0.7;
+            state.tolerance = 0.3;
+
+            document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+            ['btnRed', 'btnGreen', 'btnBlue'].forEach(id => document.getElementById(id).classList.add('active'));
+            document.getElementById('highlightToggle').checked = true;
+            document.getElementById('isolateToggle').checked = false;
+            document.getElementById('satSlider').value = 0;
+            document.getElementById('satVal').textContent = 0;
+            document.getElementById('brightSlider').value = 0;
+            document.getElementById('brightVal').textContent = 0;
+            document.getElementById('contrastSlider').value = 0;
+            document.getElementById('contrastVal').textContent = 0;
+            document.getElementById('dimSlider').value = 70;
+            document.getElementById('dimVal').textContent = '70%';
+            document.getElementById('tolSlider').value = 30;
+            document.getElementById('tolVal').textContent = '30%';
+
+            render();
+            showToast('Filter zurückgesetzt');
+        };
+
+        // Save Image Logic
+        function exportImage(format) {
+            if (!state.image) {
+                showToast('Kein Bild zum Speichern geladen');
                 return;
             }
 
-            const tempCanvas = document.createElement('canvas');
-            tempCanvas.width = newW;
-            tempCanvas.height = newH;
-            const tCtx = tempCanvas.getContext('2d');
-            tCtx.drawImage(originalImage, 0, 0, newW, newH);
+            const downloadLink = document.createElement('a');
 
-            const img = new Image();
-            img.onload = () => {
-                originalImage = img;
-                sourceImageWidth = newW;
-                sourceImageHeight = newH;
-                resetViewAndProcess();
-                alert(`Bildgröße erfolgreich auf ${newW}×${newH}px angepasst!`);
-            };
-            img.src = tempCanvas.toDataURL();
-        });
+            if (format === 'jpeg') {
+                const exportCanvas = document.createElement('canvas');
+                exportCanvas.width = canvas.width;
+                exportCanvas.height = canvas.height;
+                const eCtx = exportCanvas.getContext('2d');
+                eCtx.fillStyle = '#0b0f19';
+                eCtx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+                eCtx.drawImage(canvas, 0, 0);
 
-        // --- Export & Speichern ---
-        const exportFormatSelect = document.getElementById('export-format');
-        const exportQualityRange = document.getElementById('export-quality');
-        const jpgQualityGroup = document.getElementById('jpg-quality-group');
-
-        exportFormatSelect.addEventListener('change', () => {
-            jpgQualityGroup.style.display = exportFormatSelect.value === 'image/jpeg' ? 'flex' : 'none';
-        });
-        exportQualityRange.addEventListener('input', (e) => {
-            document.getElementById('quality-val').innerText = e.target.value;
-        });
-
-        document.getElementById('btn-save').addEventListener('click', () => {
-            if (!originalImage) return;
-            const format = exportFormatSelect.value;
-            const quality = parseInt(exportQualityRange.value) / 100;
-
-            const dataUrl = canvas.toDataURL(format, quality);
-            const ext = format === 'image/jpeg' ? 'jpg' : 'png';
-            const link = document.createElement('a');
-            link.download = `farb-analyse-${Date.now()}.${ext}`;
-            link.href = dataUrl;
-            link.click();
-        });
-
-        // --- Pipette / Farbisolation Aktivierung & Klick ---
-        const btnPicker = document.getElementById('btn-picker');
-        btnPicker.addEventListener('click', () => {
-            pickerActive = !pickerActive;
-            if (pickerActive) {
-                btnPicker.style.background = '#ef4444';
-                btnPicker.innerText = '🎯 Pipette aktiv (Klicken Sie ins Bild)';
-                canvas.style.cursor = 'crosshair';
+                downloadLink.download = 'rgb-analyse-export.jpg';
+                downloadLink.href = exportCanvas.toDataURL('image/jpeg', 0.92);
             } else {
-                btnPicker.style.background = '#8b5cf6';
-                btnPicker.innerText = '🎯 Farbe mit Pipette wählen';
-                canvas.style.cursor = 'grab';
+                downloadLink.download = 'rgb-analyse-export.png';
+                downloadLink.href = canvas.toDataURL('image/png');
             }
-        });
 
-        canvas.addEventListener('click', (e) => {
-            if (!pickerActive || !originalImage) return;
+            downloadLink.click();
+            saveDropdown.classList.remove('show');
+            showToast(`Bild als ${format.toUpperCase()} gespeichert`);
+        }
 
-            const rect = canvas.getBoundingClientRect();
-            const clickX = e.clientX - rect.left;
-            const clickY = e.clientY - rect.top;
+        savePngBtn.onclick = () => exportImage('png');
+        saveJpgBtn.onclick = () => exportImage('jpeg');
 
-            // Koordinaten auf die tatsächliche Canvas-Auflösung umrechnen
-            const scaleX = canvas.width / rect.width;
-            const scaleY = canvas.height / rect.height;
-            const pixelX = Math.floor(clickX * scaleX);
-            const pixelY = Math.floor(clickY * scaleY);
+        // Panel Toggle
+        const togglePanel = () => panel.classList.toggle('collapsed');
+        document.getElementById('togglePanelBtn').onclick = togglePanel;
+        document.getElementById('closePanelBtn').onclick = togglePanel;
 
-            if (pixelX >= 0 && pixelX < canvas.width && pixelY >= 0 && pixelY < canvas.height) {
-                // Nur aktuellen Canvas-Zustand (inkl. aktiver Filter) abfragen
-                const pData = ctx.getImageData(pixelX, pixelY, 1, 1).data;
-                targetColor = { r: pData[0], g: pData[1], b: pData[2] };
-
-                // UI aktualisieren
-                const hex = '#' + [targetColor.r, targetColor.g, targetColor.b].map(x => x.toString(16).padStart(2, '0')).join('');
-                document.getElementById('color-preview-sample').style.backgroundColor = hex;
-                document.getElementById('color-info-text').innerText = `RGB(${targetColor.r}, ${targetColor.g}, ${targetColor.b})\nHEX: ${hex}`;
-                document.getElementById('isolation-preview-box').style.display = 'flex';
-                document.getElementById('btn-reset-isolation').style.display = 'block';
-
-                // Pipette beenden
-                pickerActive = false;
-                btnPicker.style.background = '#8b5cf6';
-                btnPicker.innerText = '🎯 Farbe mit Pipette wählen';
-                canvas.style.cursor = 'grab';
-
-                processImage();
-            }
-        });
-
-        document.getElementById('btn-reset-isolation').addEventListener('click', () => {
-            targetColor = null;
-            document.getElementById('isolation-preview-box').style.display = 'none';
-            document.getElementById('btn-reset-isolation').style.display = 'none';
-            processImage();
-        });
-
-        // --- Zoom & Pan (Mausrad & Dragging) ---
-        wrapper.addEventListener('wheel', (e) => {
+        // --- Interactive Canvas Gestures (Mouse & Touch Pan/Zoom) ---
+        workspace.onwheel = (e) => {
+            if (!state.image) return;
             e.preventDefault();
-            if (!originalImage) return;
-            const zoomIntensity = 1.1;
-            const rect = canvas.getBoundingClientRect();
-            const mouseX = e.clientX - rect.left;
-            const mouseY = e.clientY - rect.top;
-
-            let newScale = e.deltaY < 0 ? scale * zoomIntensity : scale / zoomIntensity;
-            newScale = Math.max(0.1, Math.min(20, newScale));
-
-            panX = mouseX - (mouseX - panX) * (newScale / scale);
-            panY = mouseY - (mouseY - panY) * (newScale / scale);
-            scale = newScale;
-
-            drawCanvasTransform();
-        }, { passive: false });
-
-        wrapper.addEventListener('mousedown', (e) => {
-            if (pickerActive) return;
-            isDragging = true;
-            startX = e.clientX - panX;
-            startY = e.clientY - panY;
-        });
-
-        window.addEventListener('mousemove', (e) => {
-            if (!isDragging) return;
-            panX = e.clientX - startX;
-            panY = e.clientY - startY;
-            drawCanvasTransform();
-        });
-
-        window.addEventListener('mouseup', () => {
-            isDragging = false;
-        });
-
-        // Initiales Testbild beim Start laden
-        window.onload = () => {
-            loadTestImage();
+            const zoom = e.deltaY < 0 ? 1.1 : 0.9;
+            state.scale = Math.min(Math.max(0.05, state.scale * zoom), 10);
+            updateTransform();
         };
+
+        workspace.onmousedown = (e) => {
+            if (state.pipetteActive || e.target === panel || panel.contains(e.target)) return;
+            state.isDragging = true;
+            state.dragStart = { x: e.clientX - state.panX, y: e.clientY - state.panY };
+        };
+
+        window.onmousemove = (e) => {
+            if (!state.isDragging) return;
+            state.panX = e.clientX - state.dragStart.x;
+            state.panY = e.clientY - state.dragStart.y;
+            updateTransform();
+        };
+
+        window.onmouseup = () => state.isDragging = false;
+
+        // Touch event handlers for mobile pinch-to-zoom and panning
+        workspace.ontouchstart = (e) => {
+            if (state.pipetteActive || e.target === panel || panel.contains(e.target)) return;
+            if (e.touches.length === 1) {
+                state.isDragging = true;
+                state.dragStart = { x: e.touches[0].clientX - state.panX, y: e.touches[0].clientY - state.panY };
+            } else if (e.touches.length === 2) {
+                state.isDragging = false;
+                state.touchStartDist = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+                state.initialScale = state.scale;
+            }
+        };
+
+        workspace.ontouchmove = (e) => {
+            if (e.touches.length === 1 && state.isDragging) {
+                state.panX = e.touches[0].clientX - state.dragStart.x;
+                state.panY = e.touches[0].clientY - state.panY = e.touches[0].clientY - state.dragStart.y;
+                updateTransform();
+            } else if (e.touches.length === 2) {
+                const dist = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+                if (state.touchStartDist > 0) {
+                    const factor = dist / state.touchStartDist;
+                    state.scale = Math.min(Math.max(0.05, state.initialScale * factor), 10);
+                    updateTransform();
+                }
+            }
+        };
+
+        workspace.ontouchend = () => {
+            state.isDragging = false;
+            state.touchStartDist = 0;
+        };
+
+        window.onresize = () => resetZoom();
     </script>
 </body>
 </html>
